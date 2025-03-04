@@ -1,0 +1,155 @@
+/* Luxury Animations */
+
+/* Gold shimmer effect */
+@keyframes goldShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.shimmer-gold {
+  background: linear-gradient(90deg, #d4af37 0%, #f5df4d 25%, #d4af37 50%, #f5df4d 75%, #d4af37 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: goldShimmer 4s ease-in-out infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+/* Luxury button hover effect */
+.luxury-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.luxury-button::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, rgba(255,215,0,0.1) 0%, rgba(212,175,55,0.2) 100%);
+  transition: width 0.4s cubic-bezier(0.42, 0, 0.58, 1);
+  z-index: -1;
+}
+
+.luxury-button:hover::before {
+  width: 100%;
+}
+
+/* Gold box shadow pulse */
+@keyframes goldShadowPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
+
+.gold-pulse {
+  animation: goldShadowPulse 2s infinite;
+}
+
+/* Elegant text reveal */
+@keyframes elegantReveal {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.elegant-reveal {
+  opacity: 0;
+  animation: elegantReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Staggered children animation classes */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.stagger-children > *:nth-child(1) {
+  animation: elegantReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
+
+.stagger-children > *:nth-child(2) {
+  animation: elegantReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+}
+
+.stagger-children > *:nth-child(3) {
+  animation: elegantReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+.stagger-children > *:nth-child(4) {
+  animation: elegantReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+}
+
+.stagger-children > *:nth-child(5) {
+  animation: elegantReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+}
+
+/* Luxury underline animation */
+.luxury-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.luxury-underline::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background: linear-gradient(90deg, #d4af37, #f5df4d);
+  transition: width 0.3s ease;
+}
+
+.luxury-underline:hover::after {
+  width: 100%;
+}
+
+/* 3D Hover Effect */
+.hover-3d {
+  transition: transform 0.3s ease-out;
+}
+
+.hover-3d:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(2deg) scale(1.03);
+}
+
+/* Background particles class */
+.particles-bg {
+  position: relative;
+} 

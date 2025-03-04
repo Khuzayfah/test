@@ -1,0 +1,15 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://singrank.sg.com/sitemap.xml
+
+# Disallow crawling of administrative pages
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+
+# Crawl delay for all bots
+User-agent: *
+Crawl-delay: 10 
