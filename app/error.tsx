@@ -1,6 +1,14 @@
 'use client';
 
+/**
+ * Professional Error Page
+ * 
+ * This component provides a clean, professional error page when unexpected errors occur.
+ * It allows users to try again or navigate back to the home page.
+ */
+
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Error({
   error,
@@ -10,30 +18,45 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log error to analytics service
+    // Log the error to an error reporting service
     console.error(error);
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-gray-900 px-6 py-24 sm:py-32 lg:px-8 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="text-center">
-        <p className="text-base font-semibold text-amber-500">Error Occurred</p>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-100 sm:text-5xl">
-          Oops! Something went wrong
+        <div className="text-luxury-red-600 text-5xl mb-8">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-24 w-24 mx-auto"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Something went wrong
         </h1>
-        <p className="mt-6 text-base leading-7 text-gray-300">
-          Sorry, an unexpected error has occurred. Our team has been notified.
+        <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
+          We apologize for the inconvenience. Please try again or return to the homepage.
         </p>
-        <div className="mt-10 flex items-center justify-center gap-x-6">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={() => reset()}
-            className="rounded-md bg-gradient-to-r from-amber-500 to-amber-600 px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-lg hover:shadow-amber-500/20 hover:from-amber-400 hover:to-amber-500 transition-all duration-300"
+            className="btn-primary"
           >
-            Try Again
+            Try again
           </button>
-          <a href="/" className="text-sm font-semibold text-amber-400 hover:text-amber-300 transition-all duration-300">
-            Back to home <span aria-hidden="true">&rarr;</span>
-          </a>
+          <Link href="/" className="btn-secondary">
+            Return to homepage
+          </Link>
         </div>
       </div>
     </div>

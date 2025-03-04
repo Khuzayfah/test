@@ -1,146 +1,164 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+/**
+ * Luxury Red and White Particle Background
+ * 
+ * An elegant animated background with floating particles in luxury red and gold tones.
+ * Features:
+ * - Premium particle animation with luxury color scheme
+ * - Variable opacity and size for depth effect
+ * - Subtle connection lines between particles
+ * - Optimized performance with canvas rendering
+ */
+
+import React, { useRef, useEffect, useState } from 'react';
 
 interface Particle {
   x: number;
   y: number;
-  size: number;
-  speedX: number;
-  speedY: number;
+  dx: number;
+  dy: number;
+  radius: number;
   color: string;
 }
 
 export default function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const particles = useRef<Particle[]>([]);
-
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  
+  // Initialize canvas and particles
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
+    
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    // Set canvas dimensions
-    const setCanvasDimensions = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    
+    // Set canvas to full window size
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      setDimensions({ width, height });
     };
-
-    // Initialize function to create particles
-    const initParticles = () => {
-      particles.current = [];
-      const particleCount = Math.min(50, Math.floor(window.innerWidth / 30)); // Responsive particle count
+    
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    
+    // Particle configuration
+    const particleCount = Math.min(Math.max(Math.floor(window.innerWidth * 0.05), 40), 100);
+    const connectionDistance = 150;
+    const particles: Particle[] = [];
+    
+    // Luxury color palette
+    const luxuryColors = [
+      'rgba(229, 62, 62, 0.5)',  // Luxury red 500 with 50% opacity
+      'rgba(197, 48, 48, 0.6)',  // Luxury red 600 with 60% opacity
+      'rgba(212, 175, 55, 0.7)', // Gold main with 70% opacity
+      'rgba(249, 218, 139, 0.4)', // Gold light with 40% opacity
+      'rgba(255, 248, 230, 0.6)', // Luxury white cream with 60% opacity
+    ];
+    
+    // Initialize particles with luxury styling
+    for (let i = 0; i < particleCount; i++) {
+      const radius = Math.random() * 3 + 1;
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+      const dx = (Math.random() - 0.5) * 0.5;
+      const dy = (Math.random() - 0.5) * 0.5;
       
-      for (let i = 0; i < particleCount; i++) {
-        const size = Math.random() * 3 + 1;
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const speedX = (Math.random() - 0.5) * 0.3;
-        const speedY = (Math.random() - 0.5) * 0.3;
-        
-        // Gold color with different opacity for depth feeling
-        const opacity = Math.random() * 0.5 + 0.1;
-        const goldTones = [
-          `rgba(212, 175, 55, ${opacity})`, // Gold
-          `rgba(218, 165, 32, ${opacity})`, // Golden rod
-          `rgba(207, 181, 59, ${opacity})`, // Gold/yellow
-          `rgba(255, 215, 0, ${opacity})`, // Gold
-          `rgba(184, 134, 11, ${opacity})`, // Dark golden rod
-        ];
-        
-        const color = goldTones[Math.floor(Math.random() * goldTones.length)];
-        
-        particles.current.push({
-          x,
-          y,
-          size,
-          speedX,
-          speedY,
-          color,
-        });
-      }
-    };
-
-    // Animation function
+      // Smaller particles get lighter colors, larger particles get more vibrant colors
+      const colorIndex = radius > 2.5 ? 
+        Math.floor(Math.random() * 3) : // Red and gold for larger particles
+        Math.floor(Math.random() * 2) + 3; // Lighter colors for smaller particles
+                  
+      particles.push({
+        x,
+        y,
+        dx,
+        dy,
+        radius,
+        color: luxuryColors[colorIndex],
+      });
+    }
+    
+    // Animation loop
     const animate = () => {
+      requestAnimationFrame(animate);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      particles.current.forEach((particle) => {
-        // Update position
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
+      // Update and draw particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
         
-        // Wrap around screen
-        if (particle.x > canvas.width) particle.x = 0;
-        else if (particle.x < 0) particle.x = canvas.width;
+        // Move particles
+        p.x += p.dx;
+        p.y += p.dy;
         
-        if (particle.y > canvas.height) particle.y = 0;
-        else if (particle.y < 0) particle.y = canvas.height;
+        // Bounce off edges
+        if (p.x + p.radius > canvas.width || p.x - p.radius < 0) {
+          p.dx = -p.dx;
+        }
+        
+        if (p.y + p.radius > canvas.height || p.y - p.radius < 0) {
+          p.dy = -p.dy;
+        }
         
         // Draw particle
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = particle.color;
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
         ctx.fill();
         
-        // Connect particles that are close to each other
-        connectParticles(particle);
-      });
-      
-      requestAnimationFrame(animate);
-    };
-
-    // Function to draw lines between close particles
-    const connectParticles = (particle: Particle) => {
-      const connectionRadius = 150; // Distance threshold for connection
-      
-      particles.current.forEach((otherParticle) => {
-        if (particle === otherParticle) return;
-        
-        const dx = particle.x - otherParticle.x;
-        const dy = particle.y - otherParticle.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < connectionRadius) {
-          // Calculate opacity based on distance (closer = more opaque)
-          const opacity = 1 - (distance / connectionRadius);
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(212, 175, 55, ${opacity * 0.15})`; // Gold color with dynamic opacity
-          ctx.lineWidth = 0.5;
-          ctx.moveTo(particle.x, particle.y);
-          ctx.lineTo(otherParticle.x, otherParticle.y);
-          ctx.stroke();
+        // Draw connections between particles
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const distance = Math.sqrt(
+            Math.pow(p.x - p2.x, 2) + Math.pow(p.y - p2.y, 2)
+          );
+          
+          if (distance < connectionDistance) {
+            // Calculate opacity based on distance - closer particles have more visible connections
+            const opacity = 1 - distance / connectionDistance;
+            
+            // Draw connection line
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            
+            // Use gradient for connection lines based on particle colors
+            if (p.radius > 2 || p2.radius > 2) {
+              // More visible connections for larger particles
+              ctx.strokeStyle = `rgba(212, 175, 55, ${opacity * 0.3})`; // Gold connections
+            } else {
+              // Subtle connections for smaller particles
+              ctx.strokeStyle = `rgba(229, 62, 62, ${opacity * 0.15})`; // Red connections
+            }
+            
+            ctx.lineWidth = Math.min(p.radius, p2.radius) * 0.3;
+            ctx.stroke();
+          }
         }
-      });
+      }
     };
-
-    // Handle window resize
-    const handleResize = () => {
-      setCanvasDimensions();
-      initParticles();
-    };
-
-    // Initialize
-    setCanvasDimensions();
-    initParticles();
+    
     animate();
     
-    // Set up event listeners
-    window.addEventListener('resize', handleResize);
-    
-    // Clean up
     return () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
+  
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 -z-20 bg-transparent pointer-events-none"
-      style={{ opacity: 0.3 }}
+      className="absolute inset-0 z-0 bg-luxury-white-pearl"
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'fixed',
+      }}
     />
   );
 } 

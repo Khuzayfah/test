@@ -1,115 +1,198 @@
+/**
+ * Professional Blog Page
+ * 
+ * This page presents our collection of industry insights and expertise with a clean,
+ * professional design that emphasizes trust, knowledge, and authority.
+ * 
+ * Features:
+ * - Clean white background with subtle blue accents for trust
+ * - Professional card design for each blog post
+ * - Consistent typography and spacing
+ * - Subtle animations for improved engagement
+ */
+
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
+import PageLayout from '../components/PageLayout';
 
-const posts = [
+// Sample blog posts
+const blogPosts = [
   {
     id: 1,
-    title: '10 SEO Strategies That Actually Work in 2024',
-    description: 'Learn the most effective SEO strategies that will help your website rank higher in search results.',
+    title: '10 SEO Strategies That Will Dominate in 2024',
+    description: 'Stay ahead of the competition with these proven SEO strategies that are set to deliver the best results in the coming year.',
     category: 'SEO',
-    date: 'Mar 16, 2024',
-    readTime: '5 min read',
+    date: 'March 15, 2024',
+    readTime: '8 min read'
   },
   {
     id: 2,
-    title: 'The Complete Guide to Social Media Marketing',
-    description: 'Everything you need to know about building a strong social media presence for your business.',
+    title: 'How to Build a Social Media Strategy That Converts',
+    description: 'Learn how to create a social media strategy focused on driving conversions rather than just increasing vanity metrics.',
     category: 'Social Media',
-    date: 'Mar 14, 2024',
-    readTime: '8 min read',
+    date: 'March 10, 2024',
+    readTime: '6 min read'
   },
   {
     id: 3,
     title: 'Content Marketing Trends to Watch in 2024',
-    description: 'Stay ahead of the curve with these emerging content marketing trends that will shape the industry.',
+    description: 'Discover the latest content marketing trends that are shaping the digital landscape and how you can leverage them.',
     category: 'Content Marketing',
-    date: 'Mar 12, 2024',
-    readTime: '6 min read',
+    date: 'March 5, 2024',
+    readTime: '7 min read'
   },
   {
     id: 4,
-    title: 'How to Create a Successful PPC Campaign',
-    description: 'A step-by-step guide to creating and managing successful pay-per-click advertising campaigns.',
+    title: 'PPC Campaign Optimization: A Step-by-Step Guide',
+    description: 'Follow this comprehensive guide to optimize your PPC campaigns for better performance and higher ROI.',
     category: 'PPC',
-    date: 'Mar 10, 2024',
-    readTime: '7 min read',
+    date: 'February 28, 2024',
+    readTime: '10 min read'
   },
   {
     id: 5,
-    title: 'Email Marketing Best Practices for Higher Conversion',
-    description: 'Discover proven email marketing strategies that will help you increase your conversion rates.',
+    title: 'Email Marketing Best Practices for 2024',
+    description: 'Maximize your email marketing effectiveness with these up-to-date best practices for higher open rates and conversions.',
     category: 'Email Marketing',
-    date: 'Mar 8, 2024',
-    readTime: '6 min read',
+    date: 'February 20, 2024',
+    readTime: '5 min read'
   },
   {
     id: 6,
-    title: 'The Power of Video Marketing in Digital Strategy',
-    description: 'Learn how to leverage video content to enhance your digital marketing strategy and engage your audience.',
+    title: 'How Video Marketing is Transforming Digital Strategies',
+    description: 'Explore how video marketing is changing the digital landscape and how businesses are leveraging it for growth.',
     category: 'Video Marketing',
-    date: 'Mar 6, 2024',
-    readTime: '5 min read',
-  },
+    date: 'February 15, 2024',
+    readTime: '8 min read'
+  }
 ];
 
+// Blog categories for filtering
+const categories = ['All', 'SEO', 'Social Media', 'Content Marketing', 'PPC', 'Email Marketing', 'Video Marketing'];
+
 export default function Blog() {
+  // State for category filtering
+  const [activeCategory, setActiveCategory] = useState('All');
+  
+  // Filtered blog posts based on category selection
+  const filteredPosts = activeCategory === 'All' 
+    ? blogPosts 
+    : blogPosts.filter(post => post.category === activeCategory);
+  
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
-    <div className="bg-gray-900 py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+    <PageLayout
+      title="Latest Industry Insights"
+      description="Stay up-to-date with the latest digital marketing trends, strategies, and best practices through our regularly updated blog."
+    >
+      {/* Category filters */}
+      <div className="flex flex-wrap justify-center mb-12 gap-3">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setActiveCategory(category)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+              activeCategory === category
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-blue-100'
+            }`}
           >
-            <h2 className="text-3xl font-bold tracking-tight text-gray-100 sm:text-4xl">Latest Insights</h2>
-            <p className="mt-6 text-lg leading-8 text-gray-300">
-              Stay updated with the latest trends and insights in digital marketing
-            </p>
-          </motion.div>
-        </div>
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-          {posts.map((post, index) => (
-            <motion.article
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex flex-col items-start p-6 rounded-xl bg-gray-800/50 ring-1 ring-amber-900/20 hover:shadow-xl hover:shadow-amber-900/10 transition-all duration-300"
-            >
-              <div className="flex items-center gap-x-4 text-xs">
-                <time dateTime={post.date} className="text-gray-400">
-                  {post.date}
-                </time>
-                <span className="inline-flex items-center rounded-full bg-amber-900/20 px-2 py-1 text-xs font-medium text-amber-400 ring-1 ring-inset ring-amber-700/20">
-                  {post.category}
-                </span>
-              </div>
-              <div className="group relative">
-                <h3 className="mt-3 text-lg font-semibold leading-6 text-amber-400 group-hover:text-amber-300 transition-colors duration-300">
-                  <a href={`/blog/${post.id}`}>
-                    <span className="absolute inset-0" />
-                    {post.title}
-                  </a>
+            {category}
+          </button>
+        ))}
+      </div>
+      
+      {/* Blog posts grid */}
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {filteredPosts.map((post) => (
+          <motion.article 
+            key={post.id}
+            variants={itemVariants}
+            className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 group border border-gray-100 hover:border-blue-200"
+          >
+            <Link href={`/blog/${post.id}`} className="block h-full">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="trust-badge text-xs">{post.category}</div>
+                  <div className="text-sm text-gray-500 flex items-center">
+                    <span className="mr-4">{post.date}</span>
+                    <span>{post.readTime}</span>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-blue-700 transition-colors duration-300">
+                  {post.title}
                 </h3>
-                <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-300">{post.description}</p>
-              </div>
-              <div className="relative mt-8 flex items-center gap-x-4">
-                <div className="text-sm leading-6">
-                  <p className="font-semibold text-gray-300">
-                    <span className="absolute inset-0" />
-                    {post.readTime}
-                  </p>
+                <p className="text-gray-700 mb-4">{post.description}</p>
+                <div className="trust-link inline-flex items-center">
+                  Read more
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
                 </div>
               </div>
-            </motion.article>
-          ))}
+            </Link>
+          </motion.article>
+        ))}
+      </motion.div>
+      
+      {/* Newsletter Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="text-center bg-blue-50 p-12 rounded-xl shadow-sm border border-blue-100"
+      >
+        <h2 className="text-3xl font-bold mb-6">Stay Informed</h2>
+        <p className="text-gray-700 max-w-3xl mx-auto mb-8">
+          Subscribe to our newsletter to receive the latest insights and industry trends straight to your inbox.
+        </p>
+        <div className="max-w-md mx-auto">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <input 
+              type="email" 
+              placeholder="Your email address" 
+              className="flex-grow px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <button className="btn-primary whitespace-nowrap">
+              Subscribe
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-3">
+            We respect your privacy. Unsubscribe at any time.
+          </p>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </PageLayout>
   );
 } 

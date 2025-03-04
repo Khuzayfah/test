@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Professional Luxury Testimonials Section
+ * 
+ * Displays client testimonials in a clean, elegant format with professional styling
+ * that builds trust and credibility. Features sophisticated animations and a
+ * professional color scheme.
+ */
+
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
@@ -35,7 +43,7 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="bg-gray-900 py-24 sm:py-32">
+    <section id="testimonials" className="bg-white py-24 sm:py-32 particles-bg">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div 
           className="mx-auto max-w-xl text-center"
@@ -44,11 +52,11 @@ export default function Testimonials() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-base font-semibold leading-8 text-amber-400">Testimonials</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-base font-semibold leading-8 text-blue-600 uppercase tracking-widest">Testimonials</h2>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Hear What Our Clients Say
           </p>
-          <p className="mt-4 text-lg leading-8 text-gray-300">
+          <p className="mt-4 text-lg leading-8 text-gray-600">
             We've helped businesses across industries achieve their digital marketing goals.
           </p>
         </motion.div>
@@ -63,14 +71,14 @@ export default function Testimonials() {
                 transition={{ duration: 0.5, delay: index * 0.2 }}
                 viewport={{ once: true, margin: "-50px" }}
               >
-                <figure className="rounded-2xl border border-gray-700 bg-gray-800 p-8 text-sm leading-6 shadow-lg transform hover:-translate-y-1 transition-all duration-300 hover:border-amber-500/30">
-                  <blockquote className="text-gray-300">
+                <figure className="rounded-2xl border border-gray-200 bg-white p-8 text-sm leading-6 shadow-lg transform hover:-translate-y-1 transition-all duration-300 hover:border-blue-200 professional-shadow">
+                  <blockquote className="text-gray-700">
                     <p>{`"${testimonial.body}"`}</p>
                   </blockquote>
                   <figcaption className="mt-6 flex items-center gap-x-4">
-                    <div className="h-10 w-10 rounded-full bg-gray-700 overflow-hidden">
+                    <div className="h-10 w-10 rounded-full bg-blue-50 overflow-hidden">
                       {testimonial.author.imageUrl && (
-                        <div className="h-full w-full bg-gray-700 flex items-center justify-center text-amber-500">
+                        <div className="h-full w-full bg-blue-50 flex items-center justify-center text-blue-500">
                           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
@@ -78,8 +86,8 @@ export default function Testimonials() {
                       )}
                     </div>
                     <div>
-                      <div className="font-semibold text-gray-100">{testimonial.author.name}</div>
-                      <div className="text-gray-400">{`${testimonial.author.role}, ${testimonial.author.company}`}</div>
+                      <div className="font-semibold text-blue-700">{testimonial.author.name}</div>
+                      <div className="text-gray-500">{`${testimonial.author.role}, ${testimonial.author.company}`}</div>
                     </div>
                   </figcaption>
                 </figure>

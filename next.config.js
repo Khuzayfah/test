@@ -3,8 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: [], // Add any external image domains here if needed
-    unoptimized: false,
+    domains: ['images.unsplash.com'],
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -19,8 +18,6 @@ const nextConfig = {
     },
   },
   experimental: {
-    // Enable server actions
-    serverActions: true,
     // Enable React Server Components optimizations
     serverComponentsExternalPackages: [],
   },

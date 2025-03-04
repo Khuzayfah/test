@@ -1,124 +1,211 @@
-'use client';
+/**
+ * Hero Section - Elegant Red and White Luxury Theme
+ * 
+ * A sophisticated hero section that combines classic luxury with modern elegance.
+ * Features rich red accents, gold decorative elements, and timeless typography.
+ * Designed to create a memorable first impression with premium visuals.
+ */
 
+import React from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+
+// Animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { 
+      duration: 0.8,
+      ease: [0.165, 0.84, 0.44, 1]
+    }
+  }
+};
+
+const stagger = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
 
 export default function Hero() {
-  const [animateBackground, setAnimateBackground] = useState(false);
-
-  useEffect(() => {
-    setAnimateBackground(true);
-  }, []);
-
   return (
-    <div className="relative isolate overflow-hidden">
-      <motion.div 
-        animate={{ 
-          opacity: animateBackground ? [0.1, 0.2, 0.1] : 0.1,
-          scale: animateBackground ? [1, 1.05, 1] : 1,
-          rotate: animateBackground ? [0, 1, 0] : 0
-        }}
-        transition={{ 
-          duration: 15, 
-          repeat: Infinity, 
-          repeatType: "reverse",
-          ease: "easeInOut" 
-        }}
-        className="absolute inset-x-0 top-0 -z-10 transform-gpu overflow-hidden blur-3xl" 
-        aria-hidden="true"
-      >
-        <div
-          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-amber-600 to-amber-300 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-          style={{
-            clipPath:
-              'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-          }}
+    <section className="relative min-h-[90vh] overflow-hidden bg-white">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 z-0">
+        {/* Subtle gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white to-[#FFF5F5]"></div>
+        
+        {/* Red accent circle */}
+        <motion.div 
+          className="absolute -top-20 -right-20 w-80 h-80 rounded-full opacity-5 bg-luxury-red-600"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.05 }}
+          transition={{ duration: 2, ease: "easeOut" }}
         />
-      </motion.div>
-
-      <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-40">
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl">
+        
+        {/* Gold decorative elements */}
+        <motion.div
+          className="absolute bottom-10 left-10 w-64 h-64 rounded-full opacity-5 bg-luxury-gold-main"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.05 }}
+          transition={{ duration: 2, ease: "easeOut", delay: 0.3 }}
+        />
+        
+        {/* Luxury corner ornaments */}
+        <div className="absolute top-10 left-10 w-40 h-40 border-t-2 border-l-2 border-luxury-gold-main/20" />
+        <div className="absolute bottom-10 right-10 w-40 h-40 border-b-2 border-r-2 border-luxury-gold-main/20" />
+      </div>
+      
+      {/* Main content */}
+      <div className="container mx-auto px-4 py-20 md:py-32 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left column with text content */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
+            className="luxury-corner"
           >
-            <h2 className="text-base font-semibold leading-8 text-amber-400">Elevate Your Digital Presence</h2>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Digital Marketing Excellence for Growing Businesses
-            </p>
-            <p className="mt-6 text-lg leading-8 text-gray-300">
-              Drive growth, increase visibility, and connect with your audience through our comprehensive digital marketing solutions.
-            </p>
+            {/* Luxury badge */}
+            <motion.div
+              variants={fadeIn}
+              className="mb-6"
+            >
+              <span className="luxury-badge">Premium Quality</span>
+            </motion.div>
+            
+            {/* Main headline */}
+            <motion.h1 
+              variants={fadeIn}
+              className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
+            >
+              Elegant & <span className="luxury-text">Sophisticated</span> Design Solutions
+            </motion.h1>
+            
+            {/* Subheadline */}
+            <motion.p 
+              variants={fadeIn}
+              className="text-xl md:text-2xl mb-8 text-luxury-gray-700 font-light"
+            >
+              Experience the perfect blend of timeless elegance and modern luxury in every detail.
+            </motion.p>
+            
+            {/* Call to action buttons */}
+            <motion.div 
+              variants={fadeIn}
+              className="flex flex-wrap gap-4"
+            >
+              <Link href="/services" className="btn-primary">
+                Explore Services
+              </Link>
+              <Link href="/contact" className="btn-secondary">
+                Contact Us
+              </Link>
+            </motion.div>
+            
+            {/* Trust indicators */}
+            <motion.div 
+              variants={fadeIn}
+              className="mt-12 flex items-center gap-8"
+            >
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-luxury-red-600">99%</span>
+                <span className="text-sm text-luxury-gray-500">Client Satisfaction</span>
+              </div>
+              <div className="w-px h-10 bg-luxury-gold-light/30"></div>
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-luxury-red-600">15+</span>
+                <span className="text-sm text-luxury-gray-500">Years Experience</span>
+              </div>
+              <div className="w-px h-10 bg-luxury-gold-light/30"></div>
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-luxury-red-600">250+</span>
+                <span className="text-sm text-luxury-gray-500">Projects Completed</span>
+              </div>
+            </motion.div>
           </motion.div>
           
-          <motion.div 
-            className="mt-10 flex items-center gap-x-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.8, 
-              delay: 0.5,
-              ease: [0.22, 1, 0.36, 1]
-            }}
+          {/* Right column with hero image */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="relative"
           >
-            <Link
-              href="/contact"
-              className="rounded-md bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:from-amber-600 hover:to-amber-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 transition-all duration-300 transform hover:scale-105"
-            >
-              Get Started
-            </Link>
-            <Link href="/services" className="text-base font-semibold leading-6 text-gray-300 hover:text-amber-300 transition-colors duration-300">
-              Learn more <span aria-hidden="true">→</span>
-            </Link>
-          </motion.div>
-        </div>
-        
-        <motion.div
-          className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:mx-0 lg:mt-10 lg:max-w-none lg:grid-cols-12"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.7 }}
-        >
-          <div className="relative lg:col-span-5 lg:-mr-8 xl:col-span-6">
-            <div className="aspect-[3/2] w-full bg-gray-800/20 border border-gray-700 object-cover rounded-2xl lg:absolute lg:inset-0">
-              <div className="h-full w-full flex items-center justify-center text-white bg-gradient-to-r from-gray-800/60 to-gray-900/70 rounded-2xl overflow-hidden">
-                <div className="p-8 text-center relative z-10">
-                  <h3 className="text-xl font-semibold text-amber-400 mb-4">Premium Digital Services</h3>
-                  <p className="mb-6 text-gray-300">Customized strategies to elevate your brand and drive measurable results</p>
-                  <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-amber-500/20 text-amber-400 mx-auto animate-pulse">
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                    </svg>
-                  </div>
-                </div>
+            <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden shadow-2xl luxury-shadow">
+              {/* Placeholder for hero image */}
+              <div className="absolute inset-0 bg-gradient-to-br from-luxury-red-500/90 to-luxury-red-700/90">
+                {/* You can replace this with your actual image */}
+                <div className="absolute inset-0 mix-blend-overlay opacity-20 bg-[url('/patterns/luxury-pattern.png')]"></div>
+              </div>
+              
+              {/* Decorative elements inside image */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div 
+                  className="text-white text-9xl font-serif"
+                  initial={{ rotate: -5, opacity: 0.3 }}
+                  animate={{ 
+                    rotate: 5, 
+                    opacity: 0.5,
+                    transition: { 
+                      repeat: Infinity, 
+                      repeatType: "reverse", 
+                      duration: 5 
+                    } 
+                  }}
+                >
+                  <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="0.5"/>
+                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="0.5"/>
+                    <path d="M12 7V5" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"/>
+                    <path d="M17 12H19" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"/>
+                    <path d="M12 17V19" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"/>
+                    <path d="M7 12H5" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"/>
+                  </svg>
+                </motion.div>
+              </div>
+              
+              {/* Decorative label */}
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm p-4 text-white">
+                <p className="text-center text-sm uppercase tracking-widest">Exquisite Elegance</p>
               </div>
             </div>
-          </div>
-          <div className="lg:col-span-7 xl:col-span-6">
-            <div className="text-base leading-7 text-gray-300 p-6 rounded-lg border border-gray-700 bg-gray-800/30">
-              <p>
-                <strong className="font-semibold text-amber-400">Why choose us?</strong> Our agency brings together strategic thinking, creative excellence, and technical expertise to deliver outstanding results for our clients.
-              </p>
-              <ul role="list" className="mt-8 max-w-xl space-y-4 text-gray-300">
-                <li className="flex gap-x-3">
-                  <span className="text-amber-500" aria-hidden="true">✓</span>
-                  <span>Data-driven strategies tailored to your business goals</span>
-                </li>
-                <li className="flex gap-x-3">
-                  <span className="text-amber-500" aria-hidden="true">✓</span>
-                  <span>Transparent reporting and clear communication</span>
-                </li>
-                <li className="flex gap-x-3">
-                  <span className="text-amber-500" aria-hidden="true">✓</span>
-                  <span>Continuous optimization for maximum ROI</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </motion.div>
+            
+            {/* Decorative floating element */}
+            <motion.div 
+              className="absolute -right-10 -bottom-10 w-24 h-24 bg-white rounded-full shadow-xl flex items-center justify-center"
+              initial={{ y: 10 }}
+              animate={{ 
+                y: -10,
+                transition: { 
+                  repeat: Infinity, 
+                  repeatType: "reverse", 
+                  duration: 3,
+                  ease: "easeInOut"
+                } 
+              }}
+            >
+              <div className="text-luxury-gold-main">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
-    </div>
+      
+      {/* Bottom decorative divider */}
+      <div className="absolute bottom-0 left-0 right-0">
+        <div className="luxury-divider"></div>
+      </div>
+    </section>
   );
 } 
