@@ -30,13 +30,19 @@
 import { motion } from 'framer-motion';
 import React from 'react';
 
-interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
+interface ButtonProps {
+  children?: any;
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'sm' | 'md' | 'lg';
-  icon?: React.ReactNode;
+  icon?: any;
   fullWidth?: boolean;
   isLoading?: boolean;
   luxuryAnimation?: boolean;
+  className?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  [key: string]: any; // Allow other HTML button props
 }
 
 export default function Button({
@@ -50,34 +56,29 @@ export default function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  // Size-specific classes for consistent sizing
+  // Size classes
   const sizeClasses = {
-    sm: 'px-3.5 py-1.5 text-sm tracking-wide',
-    md: 'px-5 py-2.5 text-base tracking-wider',
-    lg: 'px-7 py-3.5 text-lg tracking-widest'
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-md',
+    lg: 'px-6 py-3 text-lg',
   };
 
-  // Variant-specific classes for consistent styling
+  // Variant classes
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-[#7857FF] to-[#1F69FF] text-white hover:from-[#8A6CFF] hover:to-[#4F89FF] border border-[#7857FF]/50 focus:ring-[#1F69FF] font-semibold uppercase relative overflow-hidden',
-    secondary: 'bg-black text-[#7857FF] hover:bg-gray-900 border border-[#1F69FF]/50 hover:border-[#7857FF]/60 focus:ring-[#1F69FF] uppercase',
-    outline: 'bg-transparent text-[#7857FF] border-2 border-[#7857FF]/70 hover:bg-[#7857FF]/10 focus:ring-[#7857FF] uppercase'
+    primary: 'bg-gradient-to-r from-[#7857FF] to-[#2E93FF] text-white',
+    secondary: 'bg-gray-900 text-white border border-[#1F69FF]/30 hover:border-[#1F69FF]/60',
+    outline: 'bg-transparent border-2 border-[#7857FF] text-[#7857FF] hover:bg-[#7857FF]/10',
   };
 
-  // Full width class
+  // Width class
   const widthClass = fullWidth ? 'w-full' : '';
 
-  // Shadow effects based on variant and animation preferences
-  const shadowClass = variant === 'primary' && luxuryAnimation 
-    ? 'shadow-lg hover:shadow-[#7857FF]/40 hover:shadow-xl' 
-    : 'shadow-md hover:shadow-lg';
+  // Shadow class based on variant
+  const shadowClass = variant === 'primary' ? 'shadow-lg shadow-indigo-500/20' : '';
 
-  // Animation class for luxury buttons
-  const animationClass = luxuryAnimation
-    ? 'gold-shimmer'
-    : '';
+  // Animation class
+  const animationClass = luxuryAnimation ? 'relative overflow-hidden' : '';
 
-  // Combine all classes
   const baseClass = `
     ${sizeClasses[size]} 
     ${variantClasses[variant]} 
@@ -88,6 +89,17 @@ export default function Button({
     transition-all duration-300 ease-out flex items-center justify-center ${className || ''}
   `;
 
+  // Filter out any props that might cause issues with Framer Motion's types
+  const safeProps = { ...props };
+  
+  // Remove any Framer Motion specific props to avoid type conflicts
+  delete safeProps.onDrag;
+  delete safeProps.onDragStart;
+  delete safeProps.onDragEnd;
+  delete safeProps.whileHover;
+  delete safeProps.whileTap;
+  delete safeProps.transition;
+  
   return (
     <motion.button
       whileHover={{ 
@@ -97,9 +109,9 @@ export default function Button({
       }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      disabled={isLoading || props.disabled}
       className={baseClass}
-      {...props}
+      disabled={isLoading || props.disabled}
+      {...safeProps}
     >
       {isLoading ? (
         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#1F69FF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
