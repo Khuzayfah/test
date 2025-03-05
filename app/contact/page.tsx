@@ -1,407 +1,528 @@
 /**
- * Professional Contact Page
- * 
- * This page provides a clean, professional contact interface with form and information
- * that emphasizes trust, reliability, and professionalism.
- * 
- * Features:
- * - Clean white background with subtle blue accents for trust
- * - Professional form design with validation
- * - Contact information and trust elements
- * - Subtle animations for improved engagement
+ * Professional Contact Page with WhatsApp Integration
  */
 
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { motion } from 'framer-motion';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock, FaLinkedin, FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaWhatsapp, FaRobot, FaUser, FaPaperPlane, FaSpinner } from 'react-icons/fa';
+
+// Define service options type
+type ServiceOptionsType = {
+  [key: string]: string[];
+};
+
+// Form data interface
+interface FormData {
+  name: string;
+  email: string;
+  website: string;
+  serviceCategory: string;
+  serviceType: string;
+  message: string;
+}
+
+// Message interface for chat
+interface ChatMessage {
+  type: 'bot' | 'user';
+  content: string | JSX.Element;
+  id: string;
+}
+
+// Komponen fallback untuk error
+const ErrorFallback = () => (
+  <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
+      <div className="text-red-500 text-5xl mb-4">⚠️</div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">Something went wrong</h2>
+      <p className="text-gray-600 mb-4">
+        We're sorry, but there was an error loading the chat interface.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-4 py-2 bg-luxury-red-500 text-white rounded-lg hover:bg-luxury-red-600 transition-colors"
+      >
+        Try again
+      </button>
+    </div>
+  </div>
+);
+
+// Komponen loading
+const LoadingComponent = () => (
+  <div className="min-h-[500px] flex items-center justify-center">
+    <div className="w-8 h-8 border-4 border-luxury-red-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
+  // Show loading state until client-side code is ready
+  if (!isMounted) {
+    return <LoadingComponent />;
+  }
+  
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ChatbotInterface />
+    </ErrorBoundary>
+  );
+}
+
+function ChatbotInterface() {
+  // Service categories and their respective options
+  const serviceOptions: ServiceOptionsType = {
+    "Website Development": [
+      "Desktop Website",
+      "Mobile Website",
+      "Web-based Application"
+    ],
+    "SEO Services": [
+      "SEO for Website",
+      "Content SEO (30 Days)"
+    ],
+    "Social Media": [
+      "Content Creation (30 Days)"
+    ]
+  };
+
+  // Form data and state
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
-    phone: '',
-    company: '',
-    service: '',
+    website: '',
+    serviceCategory: '',
+    serviceType: '',
     message: ''
   });
   
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [currentInput, setCurrentInput] = useState('');
+  const [currentQuestion, setCurrentQuestion] = useState<keyof FormData | null>(null);
+  const [formComplete, setFormComplete] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize chat with welcome message
+  useEffect(() => {
+    // Initial welcome message
+    const initialMessages: ChatMessage[] = [
+      {
+        type: 'bot',
+        content: (
+          <div>
+            <p className="font-bold text-luxury-red-600 mb-2">Welcome to our chat assistant!</p>
+            <p>I'll help you get in touch with our team. Could you please tell me your name?</p>
+          </div>
+        ),
+        id: 'welcome'
+      }
+    ];
     
-    // Clear error when field is being edited
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+    setChatMessages(initialMessages);
+    setCurrentQuestion('name');
+  }, []);
+
+  // Scroll to bottom of chat when messages change
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-  
-  const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
-    if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
+  }, [chatMessages]);
+
+  // Handle user input submission
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    if (!currentInput.trim() || !currentQuestion) return;
+    
+    // Add user message to chat
+    const newUserMessage: ChatMessage = {
+      type: 'user',
+      content: currentInput,
+      id: `user-${Date.now()}`
+    };
+    
+    setChatMessages(prev => [...prev, newUserMessage]);
+    
+    // Process user input
+    processUserInput(currentInput, currentQuestion);
+    
+    // Clear input field
+    setCurrentInput('');
+  };
+  
+  // Process user input based on current question
+  const processUserInput = (input: string, question: keyof FormData) => {
+    // Update form data
+    const updatedFormData = { ...formData, [question]: input };
+    setFormData(updatedFormData);
+    
+    // Determine next question based on current question
+    let nextQuestion: keyof FormData | null = null;
+    let botResponse: string | JSX.Element = '';
+    
+    // Validate current input
+    const validationError = validateField(question, input);
+    if (validationError) {
+      botResponse = (
+        <div>
+          <p className="text-red-500">{validationError}</p>
+          <p>Please try again with a valid {question}.</p>
+        </div>
+      );
+      setCurrentQuestion(question); // Stay on same question
+      
+      const errorMessage: ChatMessage = {
+        type: 'bot',
+        content: botResponse,
+        id: `bot-error-${Date.now()}`
+      };
+      
+      setChatMessages(prev => [...prev, errorMessage]);
       return;
     }
     
-    setIsSubmitting(true);
-    
-    // Simulate form submission delay
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
-      
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setSubmitSuccess(false);
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          company: '',
-          service: '',
-          message: ''
-        });
-      }, 3000);
-    }, 1500);
-  };
-  
-  return (
-    <main className="pt-20">
-      {/* Hero Section */}
-      <section className="bg-white py-16 md:py-24 relative overflow-hidden">
-        <div className="luxury-corner absolute top-0 left-0 w-full h-full"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <div className="luxury-badge mb-4">Get In Touch</div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-luxury-red-700">
-              Contact <span className="text-luxury-gold-main">SingRank</span>
-            </h1>
-            <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-              Have questions about our services or ready to elevate your digital presence? 
-              Our team of SEO experts is here to help.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Contact Information and Form Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Contact Information */}
-            <div className="lg:col-span-1">
-              <div className="bg-white p-8 rounded-lg shadow-lg luxury-border h-full">
-                <h2 className="text-2xl font-bold mb-6 text-luxury-red-700">Contact Information</h2>
-                <div className="space-y-6">
-                  <div className="flex items-start">
-                    <div className="p-3 bg-luxury-red-50 rounded-full mr-4">
-                      <FaMapMarkerAlt className="text-luxury-red-600 text-xl" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800 mb-1">Office Location</h3>
-                      <p className="text-gray-600">One Raffles Place, #20-61<br />Singapore 048616</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="p-3 bg-luxury-red-50 rounded-full mr-4">
-                      <FaPhone className="text-luxury-red-600 text-xl" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800 mb-1">Phone</h3>
-                      <p className="text-gray-600">+65 6123 4567</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="p-3 bg-luxury-red-50 rounded-full mr-4">
-                      <FaEnvelope className="text-luxury-red-600 text-xl" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                      <p className="text-gray-600">hello@singrank.com</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="p-3 bg-luxury-red-50 rounded-full mr-4">
-                      <FaClock className="text-luxury-red-600 text-xl" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-800 mb-1">Business Hours</h3>
-                      <p className="text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM<br />Saturday: 10:00 AM - 2:00 PM<br />Sunday: Closed</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-8 pt-6 border-t border-gray-100">
-                  <h3 className="font-semibold text-gray-800 mb-3">Connect With Us</h3>
-                  <div className="flex space-x-4">
-                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" 
-                       className="p-3 bg-luxury-red-50 rounded-full hover:bg-luxury-red-100 transition-colors">
-                      <FaLinkedin className="text-luxury-red-600 text-xl" />
-                    </a>
-                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
-                       className="p-3 bg-luxury-red-50 rounded-full hover:bg-luxury-red-100 transition-colors">
-                      <FaFacebook className="text-luxury-red-600 text-xl" />
-                    </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
-                       className="p-3 bg-luxury-red-50 rounded-full hover:bg-luxury-red-100 transition-colors">
-                      <FaTwitter className="text-luxury-red-600 text-xl" />
-                    </a>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
-                       className="p-3 bg-luxury-red-50 rounded-full hover:bg-luxury-red-100 transition-colors">
-                      <FaInstagram className="text-luxury-red-600 text-xl" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Contact Form */}
-            <motion.div 
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="lg:col-span-2"
-            >
-              <div className="bg-white p-8 rounded-lg shadow-lg luxury-border">
-                <h2 className="text-2xl font-bold mb-6 text-luxury-red-700">Send Us a Message</h2>
-                
-                {submitSuccess ? (
-                  <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-8 rounded-lg text-center">
-                    <div className="text-4xl mb-4">✓</div>
-                    <h3 className="text-xl font-bold mb-2">Thank You!</h3>
-                    <p>Your message has been sent successfully. We'll get back to you shortly.</p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Full Name *</label>
-                        <input
-                          type="text"
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          className={`w-full px-4 py-3 rounded-lg border ${errors.name ? 'border-red-300 bg-red-50' : 'border-luxury-red-100'} focus:border-luxury-red-300 focus:ring focus:ring-luxury-red-200 focus:ring-opacity-50 outline-none transition-colors`}
-                          placeholder="Your name"
-                        />
-                        {errors.name && <p className="mt-1 text-red-500 text-sm">{errors.name}</p>}
-                      </div>
-                      
-                      <div>
-                        <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email Address *</label>
-                        <input
-                          type="email"
-                          id="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          className={`w-full px-4 py-3 rounded-lg border ${errors.email ? 'border-red-300 bg-red-50' : 'border-luxury-red-100'} focus:border-luxury-red-300 focus:ring focus:ring-luxury-red-200 focus:ring-opacity-50 outline-none transition-colors`}
-                          placeholder="Your email"
-                        />
-                        {errors.email && <p className="mt-1 text-red-500 text-sm">{errors.email}</p>}
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label htmlFor="phone" className="block text-gray-700 font-medium mb-2">Phone Number</label>
-                        <input
-                          type="tel"
-                          id="phone"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 rounded-lg border border-luxury-red-100 focus:border-luxury-red-300 focus:ring focus:ring-luxury-red-200 focus:ring-opacity-50 outline-none transition-colors"
-                          placeholder="Your phone (optional)"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label htmlFor="company" className="block text-gray-700 font-medium mb-2">Company Name</label>
-                        <input
-                          type="text"
-                          id="company"
-                          name="company"
-                          value={formData.company}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 rounded-lg border border-luxury-red-100 focus:border-luxury-red-300 focus:ring focus:ring-luxury-red-200 focus:ring-opacity-50 outline-none transition-colors"
-                          placeholder="Your company (optional)"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="service" className="block text-gray-700 font-medium mb-2">Service of Interest</label>
-                      <select
-                        id="service"
-                        name="service"
-                        value={formData.service}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-luxury-red-100 focus:border-luxury-red-300 focus:ring focus:ring-luxury-red-200 focus:ring-opacity-50 outline-none transition-colors"
-                      >
-                        <option value="">Select a service (optional)</option>
-                        <option value="SEO">Search Engine Optimization (SEO)</option>
-                        <option value="Local SEO">Local SEO</option>
-                        <option value="Technical SEO">Technical SEO Audit</option>
-                        <option value="Content Strategy">Content Strategy</option>
-                        <option value="AEO">Answer Engine Optimization</option>
-                        <option value="Other">Other</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="message" className="block text-gray-700 font-medium mb-2">Message *</label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        rows={5}
-                        className={`w-full px-4 py-3 rounded-lg border ${errors.message ? 'border-red-300 bg-red-50' : 'border-luxury-red-100'} focus:border-luxury-red-300 focus:ring focus:ring-luxury-red-200 focus:ring-opacity-50 outline-none transition-colors`}
-                        placeholder="Tell us about your project or inquiry"
-                      ></textarea>
-                      {errors.message && <p className="mt-1 text-red-500 text-sm">{errors.message}</p>}
-                    </div>
-                    
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        className="btn-primary px-8 py-4 flex items-center justify-center"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Sending...
-                          </>
-                        ) : (
-                          'Submit Message'
-                        )}
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Map Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-luxury-red-700">Visit Our <span className="text-luxury-gold-main">Office</span></h2>
-            <p className="text-lg text-gray-600 mt-2">Located in the heart of Singapore's business district</p>
-          </div>
-          
-          <div className="rounded-lg overflow-hidden shadow-xl luxury-border">
-            <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-              <div className="flex items-center justify-center p-12 bg-luxury-red-50">
-                <div className="text-center">
-                  <FaMapMarkerAlt className="text-5xl text-luxury-red-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-luxury-red-700 mb-2">SingRank Headquarters</h3>
-                  <p className="text-gray-700">One Raffles Place, #20-61, Singapore 048616</p>
-                  <div className="mt-6">
-                    <a 
-                      href="https://maps.google.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="btn-secondary inline-flex items-center px-6 py-3"
-                    >
-                      <FaMapMarkerAlt className="mr-2" /> Get Directions
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-luxury-red-700">Frequently Asked <span className="text-luxury-gold-main">Questions</span></h2>
-            <p className="text-lg text-gray-600 mt-2 max-w-3xl mx-auto">
-              Here are answers to some common questions about our services. If you don't find what you're looking for, please contact us.
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-6">
-              {[
-                {
-                  question: "What makes SingRank different from other SEO agencies?",
-                  answer: "SingRank combines deep local market knowledge with advanced technical expertise. We focus on data-driven strategies that deliver measurable results, with a proven track record of 97% ranking improvement and 8.3x average ROI for our clients. Our comprehensive approach includes technical SEO, content strategy, and AI answer optimization."
-                },
-                {
-                  question: "How long does it take to see results from SEO efforts?",
-                  answer: "SEO is a long-term strategy, but many of our clients begin to see initial improvements within 3-6 months. The timeline varies based on your website's current state, competition in your industry, and the specific strategies implemented. We provide regular progress reports to track improvements in rankings, traffic, and conversions."
-                },
-                {
-                  question: "Do you offer customized SEO packages?",
-                  answer: "Yes, all our SEO solutions are tailored to your specific business needs and goals. We begin with a comprehensive audit to understand your current digital presence, then develop a customized strategy based on your objectives, target audience, and competitive landscape."
-                },
-                {
-                  question: "How do you measure the success of your SEO campaigns?",
-                  answer: "We track a range of metrics including organic traffic growth, keyword rankings, conversion rates, and ROI. Our reports provide transparent insights into your campaign's performance, with clear benchmarks and goals. We focus on metrics that directly impact your business success, not just vanity metrics."
-                }
-              ].map((faq, index) => (
-                <div key={index} className="bg-white p-6 rounded-lg shadow-md luxury-border">
-                  <h3 className="text-xl font-bold mb-3 text-luxury-red-700">{faq.question}</h3>
-                  <p className="text-gray-700">{faq.answer}</p>
+    // Determine next question and bot response
+    switch (question) {
+      case 'name':
+        nextQuestion = 'email';
+        botResponse = `Nice to meet you, ${input}! What's your email address?`;
+        break;
+        
+      case 'email':
+        nextQuestion = 'website';
+        botResponse = 'Great! Now, could you please share your website URL?';
+        break;
+        
+      case 'website':
+        nextQuestion = 'serviceCategory';
+        botResponse = (
+          <div>
+            <p>Thanks! Which service category are you interested in?</p>
+            <div className="mt-2 space-y-1">
+              {Object.keys(serviceOptions).map((category, index) => (
+                <div key={index} 
+                  className="cursor-pointer px-3 py-2 rounded bg-gray-800 hover:bg-luxury-red-800 transition-colors"
+                  onClick={() => {
+                    const userSelection: ChatMessage = {
+                      type: 'user',
+                      content: category,
+                      id: `user-category-${Date.now()}`
+                    };
+                    setChatMessages(prev => [...prev, userSelection]);
+                    processUserInput(category, 'serviceCategory');
+                  }}
+                >
+                  {category}
                 </div>
               ))}
             </div>
           </div>
+        );
+        break;
+        
+      case 'serviceCategory':
+        nextQuestion = 'serviceType';
+        botResponse = (
+          <div>
+            <p>Great choice! Which specific service type are you looking for?</p>
+            <div className="mt-2 space-y-1">
+              {serviceOptions[input]?.map((type, index) => (
+                <div key={index} 
+                  className="cursor-pointer px-3 py-2 rounded bg-gray-800 hover:bg-luxury-red-800 transition-colors"
+                  onClick={() => {
+                    const userSelection: ChatMessage = {
+                      type: 'user',
+                      content: type,
+                      id: `user-type-${Date.now()}`
+                    };
+                    setChatMessages(prev => [...prev, userSelection]);
+                    processUserInput(type, 'serviceType');
+                  }}
+                >
+                  {type}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+        break;
+        
+      case 'serviceType':
+        nextQuestion = 'message';
+        botResponse = 'Perfect! Finally, please tell me a bit more about your project or how we can help you.';
+        break;
+        
+      case 'message':
+        nextQuestion = null;
+        
+        // All questions have been answered, show summary
+        botResponse = (
+          <div>
+            <p className="font-bold text-luxury-red-600 mb-2">Great! Here's a summary of your information:</p>
+            <div className="bg-gray-800 p-3 rounded-lg mb-3">
+              <p><span className="text-luxury-red-400">Name:</span> {updatedFormData.name}</p>
+              <p><span className="text-luxury-red-400">Email:</span> {updatedFormData.email}</p>
+              <p><span className="text-luxury-red-400">Website:</span> {updatedFormData.website}</p>
+              <p><span className="text-luxury-red-400">Service Category:</span> {updatedFormData.serviceCategory}</p>
+              <p><span className="text-luxury-red-400">Service Type:</span> {updatedFormData.serviceType}</p>
+              <p><span className="text-luxury-red-400">Message:</span> {updatedFormData.message}</p>
+            </div>
+            <p>Would you like to submit this information?</p>
+            <div className="mt-2 flex space-x-2">
+              <button
+                onClick={handleFormSubmit}
+                className="px-4 py-2 bg-luxury-red-600 hover:bg-luxury-red-700 text-white rounded transition-colors"
+              >
+                Yes, Submit
+              </button>
+              <button
+                onClick={resetForm}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        );
+        setFormComplete(true);
+        break;
+    }
+    
+    // Add bot response to chat
+    const botMessage: ChatMessage = {
+      type: 'bot',
+      content: botResponse,
+      id: `bot-${Date.now()}`
+    };
+    
+    setChatMessages(prev => [...prev, botMessage]);
+    setCurrentQuestion(nextQuestion);
+  };
+  
+  // Validate field input
+  const validateField = (field: keyof FormData, value: string): string | null => {
+    switch (field) {
+      case 'name':
+        return value.trim() ? null : 'Name is required.';
+        
+      case 'email':
+        return value.trim() && /^\S+@\S+\.\S+$/.test(value) 
+          ? null 
+          : 'Please enter a valid email address.';
+        
+      case 'website':
+        return value.trim() ? null : 'Website is required.';
+        
+      case 'serviceCategory':
+        return Object.keys(serviceOptions).includes(value) 
+          ? null 
+          : 'Please select a valid service category.';
+        
+      case 'serviceType':
+        // Check if service type exists in the selected category
+        return formData.serviceCategory && 
+          serviceOptions[formData.serviceCategory]?.includes(value) 
+          ? null 
+          : 'Please select a valid service type.';
+        
+      case 'message':
+        return value.trim().length >= 10 
+          ? null 
+          : 'Please enter a message with at least 10 characters.';
+        
+      default:
+        return null;
+    }
+  };
+  
+  // Submit the form data
+  const handleFormSubmit = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      // Format the WhatsApp message
+      const message = `*New Inquiry*\n\n*Name:* ${formData.name}\n*Email:* ${formData.email}\n*Website:* ${formData.website}\n*Service Category:* ${formData.serviceCategory}\n*Service Type:* ${formData.serviceType}\n\n*Message:*\n${formData.message}`;
+      
+      // Encode the message for WhatsApp
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Your WhatsApp number
+      const whatsappNumber = '6512345678'; // Replace with your actual WhatsApp number
+      
+      const successMessage: ChatMessage = {
+        type: 'bot',
+        content: (
+          <div>
+            <p className="font-bold text-green-500 mb-2">Thank you for your inquiry!</p>
+            <p>I'm opening WhatsApp for you to continue the conversation with our team.</p>
+            <p className="mt-2">If you'd like to start a new conversation, just click the "Start New Chat" button below.</p>
+            <button
+              onClick={resetForm}
+              className="mt-3 px-4 py-2 bg-luxury-red-600 hover:bg-luxury-red-700 text-white rounded transition-colors"
+            >
+              Start New Chat
+            </button>
+          </div>
+        ),
+        id: `bot-success-${Date.now()}`
+      };
+      
+      setChatMessages(prev => [...prev, successMessage]);
+      
+      // Open WhatsApp with the pre-filled message
+      setTimeout(() => {
+        window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+      }, 1500);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      
+      const errorMessage: ChatMessage = {
+        type: 'bot',
+        content: (
+          <div>
+            <p className="text-red-500 font-bold">There was an error submitting your inquiry.</p>
+            <p>Please try again or contact us directly.</p>
+            <button
+              onClick={handleFormSubmit}
+              className="mt-3 px-4 py-2 bg-luxury-red-600 hover:bg-luxury-red-700 text-white rounded transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ),
+        id: `bot-error-${Date.now()}`
+      };
+      
+      setChatMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  // Reset form and start over
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      website: '',
+      serviceCategory: '',
+      serviceType: '',
+      message: ''
+    });
+    
+    setCurrentQuestion('name');
+    setFormComplete(false);
+    
+    const resetMessage: ChatMessage = {
+      type: 'bot',
+      content: (
+        <div>
+          <p className="font-bold text-luxury-red-600 mb-2">Let's start a new conversation!</p>
+          <p>Could you please tell me your name?</p>
         </div>
-      </section>
-    </main>
+      ),
+      id: `bot-reset-${Date.now()}`
+    };
+    
+    setChatMessages([resetMessage]);
+  };
+
+  return (
+    <div className="min-h-screen bg-white text-gray-800 py-10">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center mb-8">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-luxury-red-600 mb-2">Chat with Our Assistant</h1>
+              <p className="text-gray-600">I'll help you connect with our team through WhatsApp</p>
+            </div>
+          </div>
+          
+          <div className="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
+            {/* Terminal header */}
+            <div className="bg-luxury-red-600 px-4 py-2 flex items-center">
+              <div className="flex space-x-2">
+                <div className="h-3 w-3 rounded-full bg-white opacity-70"></div>
+                <div className="h-3 w-3 rounded-full bg-white opacity-80"></div>
+                <div className="h-3 w-3 rounded-full bg-white opacity-90"></div>
+              </div>
+              <div className="flex-1 text-center text-white text-sm font-medium">
+                Terminal — Contact Assistant
+              </div>
+            </div>
+            
+            {/* Chat container */}
+            <div className="p-4 h-[500px] overflow-y-auto bg-gray-50">
+              {chatMessages.map((msg) => (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`mb-4 flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`flex max-w-[80%] ${msg.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      msg.type === 'user' ? 'bg-luxury-red-600 ml-2' : 'bg-gray-200 mr-2'
+                    }`}>
+                      {msg.type === 'user' ? <FaUser size={14} className="text-white" /> : <FaRobot size={14} className="text-gray-600" />}
+                    </div>
+                    <div className={`py-2 px-4 rounded-lg ${
+                      msg.type === 'user' ? 'bg-luxury-red-600 text-white' : 'bg-white border border-gray-200 text-gray-700'
+                    }`}>
+                      {msg.content}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+              <div ref={chatEndRef} />
+              
+              {/* Typing indicator */}
+              {isSubmitting && (
+                <div className="flex items-center text-gray-600 ml-10">
+                  <FaSpinner className="animate-spin mr-2" />
+                  <span>Processing your request...</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Input area */}
+            {!isSubmitting && currentQuestion && !formComplete && (
+              <form onSubmit={handleSubmit} className="border-t border-gray-200">
+                <div className="flex items-center px-3 py-3 bg-white">
+                  <span className="text-luxury-red-600 mr-2">$</span>
+                  <input
+                    type="text"
+                    value={currentInput}
+                    onChange={(e) => setCurrentInput(e.target.value)}
+                    placeholder={`Enter your ${currentQuestion}...`}
+                    className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-400"
+                    autoFocus
+                  />
+                  <button 
+                    type="submit" 
+                    className="ml-2 text-luxury-red-600 hover:text-luxury-red-700 transition-colors"
+                    disabled={!currentInput.trim()}
+                  >
+                    <FaPaperPlane />
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 } 
