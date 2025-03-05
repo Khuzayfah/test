@@ -6,11 +6,12 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ChatTerminal from './components/ChatTerminal'
 
-// Choose one of these professional font options:
+// Optimize font loading with display: swap
 const fontOption1 = Montserrat({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-montserrat',
+  preload: true,
 })
 
 const fontOption2 = Poppins({
@@ -18,12 +19,14 @@ const fontOption2 = Poppins({
   weight: ['400', '500', '600', '700'],
   display: 'swap',
   variable: '--font-poppins',
+  preload: true,
 })
 
 const fontOption3 = Raleway({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-raleway',
+  preload: true,
 })
 
 // Pick one of the above fonts to use as your primary font
@@ -33,19 +36,21 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: '#000000', // Changed to black for luxury theme
+  // Add faster touch response
+  maximumScale: 5,
 }
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://singrank.com'),
-  title: 'SingRank - Premier SEO Agency in Singapore | Expert Digital Marketing',
-  description: 'SingRank is Singapore\'s leading SEO agency offering comprehensive digital marketing, technical SEO audits, content strategy, and local SEO services with proven results.',
-  keywords: 'SEO Singapore, digital marketing agency Singapore, technical SEO audit, content strategy, local SEO, Singapore SEO company, SingRank, Answer Engine Optimization, AI optimization',
+  title: 'SingRank | #1 SEO Agency Singapore | Top-Rated Digital Marketing',
+  description: 'SingRank - Premier SEO Agency Singapore helping businesses rank #1 on Google. Affordable SEO services, technical audits, content strategy & local SEO with proven ROI.',
+  keywords: 'SEO Agency Singapore, Singapore SEO Company, Singapore SEO Services, SEO Expert Singapore, SEO Consultant Singapore, Affordable SEO Singapore, Technical SEO Audit, Content Strategy, Local SEO, SingRank, Answer Engine Optimization, AI optimization',
   authors: [{ name: 'Khuzayfah Redo - SingRank' }],
   openGraph: {
-    title: 'SingRank - Premier SEO Agency in Singapore | Expert Digital Marketing',
-    description: 'SingRank is Singapore\'s leading SEO agency offering comprehensive digital marketing, technical SEO audits, content strategy, and local SEO services with proven results.',
+    title: 'SingRank | #1 SEO Agency Singapore | Top-Rated Digital Marketing',
+    description: 'SingRank - Premier SEO Agency Singapore helping businesses rank #1 on Google. Affordable SEO services, technical audits, content strategy & local SEO with proven ROI.',
     url: 'https://singrank.com',
-    siteName: 'SingRank',
+    siteName: 'SingRank - SEO Agency Singapore',
     locale: 'en_SG',
     type: 'website',
     images: [
@@ -53,14 +58,14 @@ export const metadata: Metadata = {
         url: 'https://singrank.com/images/singrank-og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'SingRank - Premier SEO Agency in Singapore',
+        alt: 'SingRank - #1 SEO Agency Singapore',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SingRank - Premier SEO Agency in Singapore | Expert Digital Marketing',
-    description: 'SingRank is Singapore\'s leading SEO agency offering comprehensive digital marketing, technical SEO audits, content strategy, and local SEO services with proven results.',
+    title: 'SingRank | #1 SEO Agency Singapore | Top-Rated Digital Marketing',
+    description: 'SingRank - Premier SEO Agency Singapore helping businesses rank #1 on Google. Affordable SEO services, technical audits, content strategy & local SEO with proven ROI.',
     images: ['https://singrank.com/images/singrank-twitter-image.jpg'],
   },
   robots: {
@@ -80,6 +85,10 @@ export const metadata: Metadata = {
       'en-SG': 'https://singrank.com',
     },
   },
+  verification: {
+    google: 'your-google-verification-code',
+  },
+  category: 'SEO Services',
 }
 
 export default function RootLayout({
@@ -89,6 +98,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${primaryFont.variable}`}>
+      <head>
+        {/* Preconnect to critical origins */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Preload critical assets */}
+        <link rel="preload" href="/images/logo.png" as="image" />
+      </head>
       <body className="font-sans">
         <div className="min-h-screen flex flex-col">
           <Navbar />

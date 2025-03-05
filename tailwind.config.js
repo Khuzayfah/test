@@ -90,24 +90,32 @@ module.exports = {
         },
       },
       fontFamily: {
-        // Choose one of these font combinations:
-        
-        // Option 1: Montserrat for headings, Open Sans for body
-        sans: ['Montserrat', ...fontFamily.sans],
-        body: ['Open Sans', ...fontFamily.sans],
-        
+        // Select just one font combination to reduce CSS size
         // Option 2: Poppins for everything (clean, modern)
-        sans: ['Poppins', ...fontFamily.sans],
-        
-        // Option 3: Raleway for headings, Roboto for body
-        sans: ['Raleway', ...fontFamily.sans],
-        body: ['Roboto', ...fontFamily.sans],
-        
-        // Option 4: Playfair Display for headings, Source Sans Pro for body (elegant)
-        serif: ['Playfair Display', ...fontFamily.serif],
-        sans: ['Source Sans Pro', ...fontFamily.sans],
+        sans: ['var(--font-poppins)', ...fontFamily.sans],
       },
     },
   },
+  // Add safelist for critical classes that might be dynamically generated
+  safelist: [
+    'bg-luxury-red-500',
+    'bg-luxury-red-600',
+    'bg-luxury-red-700',
+    'text-white',
+    'rounded-lg',
+    'w-full',
+    'sm:max-w-2xl',
+    'sm:w-full',
+    'w-[95%]',
+    'max-w-md',
+    'mx-auto'
+  ],
   plugins: [],
+  // Add optimization directives
+  future: {
+    hoverOnlyWhenSupported: true,
+    respectDefaultRingColorOpacity: true,
+    disableColorOpacityUtilitiesByDefault: true,
+    purgeLayersByDefault: true,
+  },
 } 

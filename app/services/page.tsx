@@ -327,42 +327,58 @@ export default function Services() {
       setIsMobile(window.innerWidth < 768);
     };
     
-    // Setup intersection observer for scroll animations
+    // Setup intersection observer for scroll animations with more efficient options
     const options = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.2,
+      threshold: 0.1, // Reduced threshold for earlier loading
     };
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const id = entry.target.getAttribute('data-id');
-        if (id) {
-          setVisibleCards(prev => ({
-            ...prev,
-            [id]: entry.isIntersecting
-          }));
-        }
-      });
-    }, options);
-
-    // Wait for DOM to be ready before observing
-    setTimeout(() => {
-      document.querySelectorAll('.service-card').forEach(card => {
-        observer.observe(card);
-      });
-    }, 100);
+    // Use a more efficient approach with a single observer
+    let observer: IntersectionObserver;
+    
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const id = entry.target.getAttribute('data-id');
+          if (id) {
+            setVisibleCards(prev => ({
+              ...prev,
+              [id]: entry.isIntersecting
+            }));
+          }
+        });
+      }, options);
+      
+      // Wait for DOM to be ready before observing
+      setTimeout(() => {
+        document.querySelectorAll('.service-card').forEach(card => {
+          observer.observe(card);
+        });
+      }, 100);
+    }
     
     // Check initially
     checkIfMobile();
     
-    // Add event listener
-    window.addEventListener('resize', checkIfMobile);
+    // Optimize resize listener with debouncing
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        checkIfMobile();
+      }, 250);
+    };
+    
+    window.addEventListener('resize', handleResize);
     
     // Clean up
     return () => {
-      window.removeEventListener('resize', checkIfMobile);
-      observer.disconnect();
+      window.removeEventListener('resize', handleResize);
+      if (observer) {
+        observer.disconnect();
+      }
+      clearTimeout(resizeTimer);
     };
   }, []);
   
@@ -388,15 +404,15 @@ export default function Services() {
     }, 300);
   };
 
-  // Function to animate service cards
+  // Function to animate service cards - optimized for better performance
   const animate = (i: number) => {
     if (!isClient || !visibleCards[i + 1]) return {};
     return { 
       opacity: 1, 
       y: 0, 
       transition: { 
-        duration: 0.7, 
-        delay: i * 0.1, 
+        duration: 0.5, // Reduced from 0.7
+        delay: Math.min(i * 0.05, 0.3), // Cap maximum delay
         ease: [0.43, 0.13, 0.23, 0.96] 
       } 
     };
@@ -522,59 +538,62 @@ export default function Services() {
           </div>
 
           {/* Service Cards */}
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {filteredServices.map((service, i) => (
-              <motion.div
-                key={service.id}
-                data-id={service.id}
-                className="service-card bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 border border-gray-100"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: i * 0.1 } }}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              >
-                <div className="bg-gradient-to-r from-[#d13239] to-[#e64c4c] p-4 flex items-center">
-                  <div className="bg-white rounded-full p-2 mr-3">
-                    <svg className="w-6 h-6 text-[#d13239]" viewBox="0 0 24 24">
-                      {renderIconPath(service.iconType)}
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-bold text-white">{service.name}</h3>
-                </div>
-                
-                <div className="p-5">
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {service.description}
-                  </p>
-                  
-                  <div className="mt-4 space-y-3">
-                    <h4 className="font-medium text-[#d13239]">Key Benefits:</h4>
-                    <ul className="pl-5 list-disc space-y-1">
-                      {service.benefits.slice(0, 3).map((benefit, index) => (
-                        <li key={index} className="text-sm text-gray-700">{benefit}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <div className="mt-6 text-center">
-                    <button
-                      onClick={() => openServiceDetails(service)}
-                      className="px-4 py-2 bg-gradient-to-r from-[#d13239] to-[#e64c4c] text-white rounded-md hover:from-[#e64c4c] hover:to-[#d13239] transition-all duration-300 inline-flex items-center justify-center w-full"
-                    >
-                      View Details
-                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          {filteredServices.length > 0 && (
+            <motion.div 
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }} // Reduced from 0.5
+            >
+              {filteredServices.map((service, i) => (
+                <motion.div
+                  key={service.id}
+                  data-id={service.id}
+                  className="service-card bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 border border-gray-100"
+                  initial={{ opacity: 0, y: 20 }} // Reduced y distance
+                  animate={animate(i)}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                  layoutId={`service-card-${service.id}`}
+                >
+                  <div className="bg-gradient-to-r from-[#d13239] to-[#e64c4c] p-4 flex items-center">
+                    <div className="bg-white rounded-full p-2 mr-3">
+                      <svg className="w-6 h-6 text-[#d13239]" viewBox="0 0 24 24">
+                        {renderIconPath(service.iconType)}
                       </svg>
-                    </button>
+                    </div>
+                    <h3 className="text-lg font-bold text-white">{service.name}</h3>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                  
+                  <div className="p-5">
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {service.description}
+                    </p>
+                    
+                    <div className="mt-4 space-y-3">
+                      <h4 className="font-medium text-[#d13239]">Key Benefits:</h4>
+                      <ul className="pl-5 list-disc space-y-1">
+                        {service.benefits.slice(0, 3).map((benefit, index) => (
+                          <li key={index} className="text-sm text-gray-700">{benefit}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={() => openServiceDetails(service)}
+                        className="px-4 py-2 bg-gradient-to-r from-[#d13239] to-[#e64c4c] text-white rounded-md hover:from-[#e64c4c] hover:to-[#d13239] transition-all duration-300 inline-flex items-center justify-center w-full"
+                      >
+                        View Details
+                        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
           
           {/* No services found message */}
           {filteredServices.length === 0 && (
@@ -620,8 +639,8 @@ export default function Services() {
         </div>
       </div>
 
-      {/* Service Modal - only render on client side */}
-      {isClient && (
+      {/* Service Modal - with improved performance */}
+      {isClient && selectedService && (
         <ServiceModal 
           isOpen={isModalOpen}
           onClose={closeServiceModal}

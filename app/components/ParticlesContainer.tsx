@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, memo } from 'react';
 import { loadSlim } from "tsparticles-slim";
 import Particles from "react-tsparticles";
 
@@ -30,7 +30,7 @@ const ParticlesContainer = () => {
             value: "#ffffff",
           },
         },
-        fpsLimit: 60,
+        fpsLimit: 30,
         particles: {
           color: {
             value: ["#ED2939", "#ffffff", "#ED2939"],
@@ -43,7 +43,7 @@ const ParticlesContainer = () => {
             width: 1,
           },
           collisions: {
-            enable: true,
+            enable: false,
           },
           move: {
             direction: "none",
@@ -52,24 +52,24 @@ const ParticlesContainer = () => {
               default: "bounce",
             },
             random: false,
-            speed: 1,
+            speed: 0.8,
             straight: false,
           },
           number: {
             density: {
               enable: true,
-              area: 800,
+              area: 1000,
             },
-            value: 80,
+            value: 40,
           },
           opacity: {
             value: 0.5,
           },
           shape: {
-            type: ["circle", "triangle", "star"],
+            type: ["circle"],
           },
           size: {
-            value: { min: 1, max: 5 },
+            value: { min: 1, max: 3 },
           },
         },
         detectRetina: true,
@@ -79,4 +79,4 @@ const ParticlesContainer = () => {
   );
 };
 
-export default ParticlesContainer; 
+export default memo(ParticlesContainer); 

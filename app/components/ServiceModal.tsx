@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Types for our service details
@@ -48,7 +48,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
     };
   }, [isOpen, onClose]);
 
-  // Animation variants
+  // Animation variants - optimized for performance
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 }
@@ -81,7 +81,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
     switch(iconType) {
       case 'seo':
         return (
-          <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+          <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
             <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
           </svg>
         );
@@ -158,14 +158,15 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
               animate="visible"
               exit="hidden"
               onClick={(e) => e.stopPropagation()}
+              layoutId={`service-${service.id}`}
             >
               {/* Modal Header */}
-              <div className="bg-gradient-to-r from-[#d13239] to-[#e64c4c] py-6 px-6 flex justify-between items-center">
+              <div className="bg-gradient-to-r from-[#d13239] to-[#e64c4c] py-4 px-4 flex justify-between items-center">
                 <div className="flex items-center">
                   <div className="mr-3 bg-white rounded-full p-2">
                     {getIcon(service.iconType)}
                   </div>
-                  <h3 id="modal-title" className="text-xl font-bold text-white">
+                  <h3 id="modal-title" className="text-xl font-bold text-white line-clamp-1">
                     {service.name}
                   </h3>
                 </div>
@@ -182,7 +183,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
               </div>
 
               {/* Modal Body */}
-              <div className="max-h-[70vh] overflow-y-auto px-6 py-4">
+              <div className="max-h-[60vh] overflow-y-auto px-4 py-3">
                 <div className="mb-4">
                   <p className="text-gray-700">{service.description}</p>
                 </div>
@@ -222,7 +223,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
               </div>
 
               {/* Modal Footer */}
-              <div className="bg-gray-50 px-6 py-4 flex justify-end">
+              <div className="bg-gray-50 px-4 py-3 flex justify-end">
                 <button
                   type="button"
                   className="px-4 py-2 bg-gradient-to-r from-[#d13239] to-[#e64c4c] text-white font-medium rounded-md hover:from-[#e64c4c] hover:to-[#d13239] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
@@ -239,4 +240,5 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
   );
 };
 
-export default ServiceModal; 
+// Use memo to prevent unnecessary re-renders
+export default memo(ServiceModal); 
