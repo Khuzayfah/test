@@ -10,7 +10,7 @@
  * - Decorative elements that enhance the luxury feel
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -19,15 +19,22 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [currentYear, setCurrentYear] = useState('');
+
+  // Set current year on client-side only
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear().toString());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     
     // Simulate API call
     setTimeout(() => {
-      setLoading(false);
+      setIsLoading(false);
       // Handle successful login
       console.log('Login attempt with:', { email, password, rememberMe });
     }, 1500);
@@ -162,18 +169,18 @@ export default function Login() {
                 <div>
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={isLoading}
                     className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-white bg-gradient-to-r from-luxury-red-600 to-luxury-red-700 hover:from-luxury-red-700 hover:to-luxury-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-luxury-red-500 transition-all duration-300 font-medium text-sm transform hover:-translate-y-0.5 ${
-                      loading ? 'opacity-80 cursor-not-allowed' : ''
+                      isLoading ? 'opacity-80 cursor-not-allowed' : ''
                     }`}
                   >
-                    {loading ? (
+                    {isLoading ? (
                       <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
                     ) : null}
-                    {loading ? 'Signing in...' : 'Sign in'}
+                    {isLoading ? 'Signing in...' : 'Sign in'}
                   </button>
                 </div>
               </form>
@@ -239,7 +246,7 @@ export default function Login() {
               Luxury experience by{' '}
               <span className="font-serif font-medium text-luxury-red-600">SingRank</span>
               <span className="text-luxury-gold-main">.</span>
-              {' '}All rights reserved &copy; {new Date().getFullYear()}
+              {' '}All rights reserved &copy; {currentYear}
             </p>
             <div className="flex justify-center space-x-3 mt-3">
               <Link href="/privacy" className="text-xs text-luxury-gray-500 hover:text-luxury-red-600 transition-colors duration-200">

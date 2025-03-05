@@ -11,6 +11,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { AiFillCaretDown } from 'react-icons/ai';
 
 // Logo letter animation variants
 const letterVariants = {
@@ -113,8 +114,8 @@ export default function Navbar() {
       )
     },
     { 
-      title: 'Projects', 
-      href: '/projects', 
+      title: 'About', 
+      href: '/about', 
       icon: (
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
           <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
@@ -122,8 +123,8 @@ export default function Navbar() {
       )
     },
     { 
-      title: 'About', 
-      href: '/about', 
+      title: 'Blog', 
+      href: '/blog', 
       icon: (
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path>

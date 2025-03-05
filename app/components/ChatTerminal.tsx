@@ -79,11 +79,11 @@ const qaDatabase = [
 
 // Special terminal commands
 const terminalCommands = {
-  help: 'Available commands:\n- help: Display this help message\n- clear: Clear the terminal\n- services: List all our services\n- contact: Display contact information\n- about: Information about SINGRANK\n- packages: View our service packages',
+  help: 'Available commands:\n- help: Display this help message\n- clear: Clear the terminal\n- services: List all our services\n- contact: Display contact information\n- blog: Read our latest blog articles\n- packages: View our service packages',
   clear: 'CLEAR_TERMINAL',
   services: 'SINGRANK offers the following services:\n- Search Engine Optimization (SEO)\n- Content Strategy & Creation\n- Technical SEO & Site Audits\n- Local SEO & Google Business Optimization\n- Social Media Marketing\n- Web Analytics & Reporting\n- Conversion Rate Optimization\n- Pay-Per-Click Advertising\n- Website Design & Development\n- Online Reputation Management\n- Mobile Optimization',
   contact: 'Contact SINGRANK:\n- Email: singrank.sg@gmail.com\n- Phone: +65 666 999\n- Facebook: @Khuzayfah.by.redo\n- Address: Singapore',
-  about: 'SINGRANK is a premier digital marketing agency based in Singapore. With over 5 years of experience, we specialize in helping businesses improve their online visibility and drive organic traffic through proven SEO strategies and digital marketing solutions.',
+  blog: 'Check out our latest blog articles at SINGRANK:\n- The Future of SEO in Singapore\n- How AI is Transforming Digital Marketing\n- Local SEO Strategies for Singapore Businesses\n- Content Marketing Trends for 2023\n- Technical SEO Checklist for E-commerce Websites\n\nVisit our blog section for more insights!',
   packages: 'SINGRANK Service Packages:\n\n1. Starter Package:\n   - Basic SEO setup\n   - Content optimization for 5 key pages\n   - Monthly performance report\n\n2. Growth Package:\n   - Comprehensive SEO strategy\n   - Content creation (4 articles/month)\n   - Technical SEO audit & fixes\n   - Social media management for 2 platforms\n\n3. Premium Package:\n   - Advanced SEO implementation\n   - Content strategy & creation (8 articles/month)\n   - Technical optimization\n   - Complete social media management\n   - PPC campaign management\n   - Monthly strategy meetings\n\nContact us for custom packages and pricing!'
 };
 
@@ -126,13 +126,18 @@ export default function ChatTerminal() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [hasNewNotification, setHasNewNotification] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      content: "SINGRANK Terminal v1.0 initialized...\nWelcome! Ask me anything about our services or type 'help' for available commands.",
-      sender: 'bot',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  
+  // Initialize messages on client-side only
+  useEffect(() => {
+    setMessages([
+      {
+        content: "SINGRANK Terminal v1.0 initialized...\nWelcome! Ask me anything about our services or type 'help' for available commands.",
+        sender: 'bot',
+        timestamp: new Date()
+      }
+    ]);
+  }, []);
   
   // Set notification after 30 seconds
   useEffect(() => {

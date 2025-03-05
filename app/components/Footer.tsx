@@ -8,7 +8,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -115,7 +115,12 @@ const footerNavigation = {
 };
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
+  const [currentYear, setCurrentYear] = useState('');
+  
+  // Use useEffect to set the date only on the client side
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear().toString());
+  }, []);
   
   return (
     <motion.footer 
@@ -194,7 +199,8 @@ export default function Footer() {
             <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm font-medium">
               <Link href="/" className="hover:text-[#d13239] transition-colors px-2 py-1">HOME</Link>
               <Link href="/services" className="hover:text-[#d13239] transition-colors px-2 py-1">SERVICES</Link>
-              <Link href="/projects" className="hover:text-[#d13239] transition-colors px-2 py-1">PROJECTS</Link>
+              <Link href="/about" className="hover:text-[#d13239] transition-colors px-2 py-1">ABOUT</Link>
+              <Link href="/blog" className="hover:text-[#d13239] transition-colors px-2 py-1">BLOG</Link>
               <Link href="/contact" className="hover:text-[#d13239] transition-colors px-2 py-1">CONTACT</Link>
             </motion.div>
 
@@ -354,19 +360,19 @@ export default function Footer() {
                   </Link>
                 </motion.li>
                 <motion.li whileHover={{ x: 8 }} transition={{ type: 'spring', stiffness: 300 }}>
-                  <Link href="/projects" className="text-white/80 hover:text-[#d13239] transition-colors flex items-center">
-                    <svg className="h-3.5 w-3.5 mr-2 text-[#d13239]" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Projects
-                  </Link>
-                </motion.li>
-                <motion.li whileHover={{ x: 8 }} transition={{ type: 'spring', stiffness: 300 }}>
                   <Link href="/about" className="text-white/80 hover:text-[#d13239] transition-colors flex items-center">
                     <svg className="h-3.5 w-3.5 mr-2 text-[#d13239]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
-                    About Us
+                    About
+                  </Link>
+                </motion.li>
+                <motion.li whileHover={{ x: 8 }} transition={{ type: 'spring', stiffness: 300 }}>
+                  <Link href="/blog" className="text-white/80 hover:text-[#d13239] transition-colors flex items-center">
+                    <svg className="h-3.5 w-3.5 mr-2 text-[#d13239]" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Blog
                   </Link>
                 </motion.li>
                 <motion.li whileHover={{ x: 8 }} transition={{ type: 'spring', stiffness: 300 }}>

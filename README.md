@@ -27,7 +27,7 @@ This is a modern, professional website for a digital marketing agency built with
 
 - **Home**: Main landing page showcasing key services and value proposition
 - **Services**: Detailed information about offered services
-- **Projects**: Portfolio of successful projects and case studies
+- **About**: Information about the company, team, and mission
 - **Blog**: Articles and insights about digital marketing
 - **Contact**: Contact form and information
 
@@ -200,7 +200,6 @@ The navbar uses a configuration array to define navigation items:
 const navigation = [
   { name: 'Home', href: '/', icon: '🏠' },
   { name: 'Services', href: '/services', icon: '⚙️' },
-  { name: 'Projects', href: '/projects', icon: '📂' },
   { name: 'Blog', href: '/blog', icon: '📝' },
   { name: 'Contact', href: '/contact', icon: '📞' },
 ];
