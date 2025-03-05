@@ -1,0 +1,37 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "18.17.0"
+  NPM_VERSION = "9.6.7"
+
+# Redirects and headers
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Identity settings
+[dev]
+  command = "npm run dev"
+
+# Netlify CMS proxy redirect
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/:splat"
+  status = 200
+
+# Enable Netlify Identity
+[[redirects]]
+  from = "/.well-known/openid-configuration"
+  to = "https://singrank.netlify.app/.well-known/openid-configuration"
+  status = 200
+  force = true
+
+# Enable git-gateway
+[[redirects]]
+  from = "/.netlify/git/*"
+  to = "https://api.netlify.com/github/content/:splat"
+  status = 200
+  force = true 

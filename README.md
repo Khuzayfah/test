@@ -13,6 +13,7 @@ This is a modern, professional website for a digital marketing agency built with
 - **Digital Loading Effect**: Welcome animation with "Welcome to SingRank! Dominate your Ranking now!" message
 - **Performance Charts**: Interactive data visualizations showing SEO results and analytics
 - **Mobile-Optimized Footer**: Specially designed compact footer for better mobile experience
+- **Netlify CMS Integration**: Content management system for easy blog updates with Git-based workflow
 
 ## Recent Improvements
 
@@ -261,3 +262,25 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Credits
 
 Created with ❤️ by [Khuzayfah] 
+
+## CMS Integration
+
+This project includes integration with Netlify CMS for content management:
+
+### Features
+- **Git-Based Workflow**: All content is stored in your Git repository
+- **User-Friendly Interface**: Easy-to-use admin UI for content editing
+- **Media Management**: Upload and manage images through the CMS
+- **Netlify Identity Authentication**: Secure access to the admin area
+
+### How to Access
+1. Deploy the site to Netlify
+2. Enable Netlify Identity in your Netlify dashboard
+3. Enable Git Gateway for repository access
+4. Access the CMS at `/admin` on your deployed site
+
+### Content Structure
+- Blog posts are stored in `content/blog` directory
+- Media files are uploaded to `public/images/uploads`
+
+For detailed setup instructions, refer to `NETLIFY_IDENTITY_SETUP.md`
