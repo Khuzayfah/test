@@ -183,20 +183,25 @@ export default function Blog() {
                 className="rounded-xl overflow-hidden shadow-lg group bg-white border border-gray-100 hover:shadow-xl transition-all duration-300"
               >
                 <Link href={`/blog/${post.id}`} className="block h-full">
-                  <div className="relative h-56 overflow-hidden">
+                  <div className="relative aspect-square overflow-hidden">
                     <div className="absolute inset-0 bg-[#d13239]/80 flex items-center justify-center z-10 opacity-0 group-hover:opacity-90 transition-opacity duration-300">
                       <span className="text-white font-medium flex items-center">
                         Read Article <FiArrowRight className="ml-2" />
                       </span>
                     </div>
-                    <div className="h-full w-full bg-gray-200 relative">
+                    <div className="h-full w-full relative">
                       <div className="absolute top-4 left-4 z-10">
                         <span className="inline-block px-3 py-1 bg-white/90 backdrop-blur-sm text-[#d13239] rounded-full text-xs font-medium">
                           {post.category}
                         </span>
                       </div>
-                      {/* Add placeholder for actual images */}
-                      <div className="h-full w-full bg-gradient-to-br from-[#f5f5f5] to-[#e0e0e0]"></div>
+                      <Image 
+                        src={post.image || '/images/blog/default.jpg'}
+                        alt={post.title}
+                        fill
+                        className="object-cover object-center"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
                     </div>
                   </div>
                   <div className="p-6">
@@ -277,14 +282,19 @@ export default function Blog() {
                 className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 group border border-gray-100 hover:border-[#ffcaca]"
               >
                 <Link href={`/blog/${post.id}`} className="block h-full">
-                  <div className="relative h-44 overflow-hidden">
-                    <div className="h-full w-full bg-gray-200 bg-gradient-to-br from-[#f5f5f5] to-[#e0e0e0]">
-                      <div className="absolute top-3 left-3">
-                        <span className="inline-block px-2.5 py-1 bg-white/90 backdrop-blur-sm text-[#d13239] rounded-full text-xs font-medium">
-                          {post.category}
-                        </span>
-                      </div>
+                  <div className="relative aspect-square overflow-hidden">
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="inline-block px-2.5 py-1 bg-white/90 backdrop-blur-sm text-[#d13239] rounded-full text-xs font-medium">
+                        {post.category}
+                      </span>
                     </div>
+                    <Image 
+                      src={post.image || '/images/blog/default.jpg'}
+                      alt={post.title}
+                      fill
+                      className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
                   </div>
                   <div className="p-5">
                     <div className="flex items-center text-xs text-gray-500 mb-3">

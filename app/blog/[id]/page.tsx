@@ -214,10 +214,19 @@ export default function BlogPost() {
             
             <div className="flex items-start mb-8 py-4">
               <div className="relative h-12 w-12 rounded-full overflow-hidden bg-gray-200 mr-4">
-                {/* Placeholder for author image */}
-                <div className="absolute inset-0 flex items-center justify-center text-gray-500 font-bold">
-                  {post.author.name.charAt(0)}
-                </div>
+                {post.author.image ? (
+                  <Image
+                    src={post.author.image}
+                    alt={post.author.name}
+                    fill
+                    className="object-cover object-center"
+                    sizes="48px"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-500 font-bold">
+                    {post.author.name.charAt(0)}
+                  </div>
+                )}
               </div>
               
               <div className="flex-1">
@@ -331,10 +340,19 @@ export default function BlogPost() {
                   <div className="bg-gray-50 p-8 rounded-xl">
                     <div className="flex flex-col md:flex-row md:items-center">
                       <div className="relative h-16 w-16 rounded-full overflow-hidden bg-gray-200 mr-6 mb-4 md:mb-0">
-                        {/* Placeholder for author image */}
-                        <div className="absolute inset-0 flex items-center justify-center text-gray-600 font-bold text-xl">
-                          {post.author.name.charAt(0)}
-                        </div>
+                        {post.author.image ? (
+                          <Image
+                            src={post.author.image}
+                            alt={post.author.name}
+                            fill
+                            className="object-cover object-center"
+                            sizes="64px"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-gray-600 font-bold text-xl">
+                            {post.author.name.charAt(0)}
+                          </div>
+                        )}
                       </div>
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-1">About {post.author.name}</h3>
@@ -379,13 +397,13 @@ export default function BlogPost() {
                       className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 group border border-gray-100"
                     >
                       <Link href={`/blog/${relatedPost.id}`} className="block">
-                        <div className="h-32 overflow-hidden rounded-t-xl">
+                        <div className="relative aspect-square overflow-hidden rounded-t-xl">
                           <Image
-                            src={relatedPost.author.image}
+                            src={relatedPost.author.image || '/images/blog/default.jpg'}
                             alt={relatedPost.title}
-                            width={128}
-                            height={128}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
                           />
                         </div>
                         <div className="p-4">
