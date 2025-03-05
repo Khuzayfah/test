@@ -1349,34 +1349,6 @@ export default function Home() {
                   </Link>
                 </motion.div>
               </motion.div>
-              
-              {/* Trust indicators */}
-              <motion.div 
-                className="mt-12 pt-8 border-t border-white/20 flex flex-wrap justify-center gap-6"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.7 }}
-              >
-                {[
-                  { icon: "🔒", text: "Risk-Free Assessment" },
-                  { icon: "🇸🇬", text: "Singapore-Based Team" },
-                  { icon: "🏆", text: "Award-Winning Agency" },
-                  { icon: "💯", text: "Guaranteed Results" }
-                ].map((item, index) => (
-                  <motion.div 
-                    key={index}
-                    className="flex items-center text-white/80"
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: 0.8 + (index * 0.1) }}
-                  >
-                    <span className="text-xl mr-2">{item.icon}</span>
-                    <span className="text-sm">{item.text}</span>
-                  </motion.div>
-                ))}
-              </motion.div>
             </div>
           </AnimatedSection>
         </div>
