@@ -169,7 +169,7 @@
   </script>
   
   <!-- Netlify CMS -->
-  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+  <script src="https://unpkg.com/@decapcms/cms@^3.0.0/dist/decap-cms.js"></script>
   
   <!-- Schema Generator Script -->
   <script src="./schema-generator.js"></script>
@@ -180,7 +180,7 @@
      * SEO Preview dan Checker Widget untuk Netlify CMS
      */
     window.addEventListener('load', () => {
-      const CMS = window.CMS;
+      const CMS = window.DecapCMS || window.CMS;
       if (!CMS) return;
       
       // Register Google Preview Widget
@@ -478,7 +478,7 @@
   <!-- Auto-generate Schema Script -->
   <script>
     window.addEventListener('load', () => {
-      const CMS = window.CMS;
+      const CMS = window.DecapCMS || window.CMS;
       if (!CMS) return;
       
       // Listen to changes on article type and auto-generate option
