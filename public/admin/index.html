@@ -311,6 +311,97 @@
         control: ({ value, onChange, entry, field }) => {
           const data = entry.get('data').toJS();
           
+          // SEO checking functions
+          const checkTitleScore = (title, keywords) => {
+            if (!title) return 0;
+            let score = 0;
+            
+            // Panjang judul optimal
+            if (title.length >= 40 && title.length <= 60) {
+              score += 40;
+            } else if (title.length > 30 && title.length < 70) {
+              score += 20;
+            }
+            
+            // Mengandung kata kunci utama
+            if (keywords && keywords.length > 0) {
+              const keywordList = keywords.split(',').map(k => k.trim().toLowerCase());
+              const titleLower = title.toLowerCase();
+              for (const kw of keywordList) {
+                if (titleLower.includes(kw)) {
+                  score += 30;
+                  break;
+                }
+              }
+            }
+            
+            // Tambahan untuk judul yang menarik
+            if (title.includes('?') || title.includes('!') || /^(How|Why|What)/.test(title)) {
+              score += 10;
+            }
+            
+            return Math.min(score, 100);
+          };
+          
+          const checkDescriptionScore = (description, keywords) => {
+            if (!description) return 0;
+            let score = 0;
+            
+            // Panjang description optimal
+            if (description.length >= 140 && description.length <= 160) {
+              score += 40;
+            } else if (description.length > 120 && description.length < 180) {
+              score += 20;
+            }
+            
+            // Mengandung kata kunci utama
+            if (keywords && keywords.length > 0) {
+              const keywordList = keywords.split(',').map(k => k.trim().toLowerCase());
+              const descLower = description.toLowerCase();
+              for (const kw of keywordList) {
+                if (descLower.includes(kw)) {
+                  score += 30;
+                  break;
+                }
+              }
+            }
+            
+            // Memiliki call-to-action
+            const ctaPatterns = ['learn', 'discover', 'find out', 'read', 'click', 'check'];
+            if (ctaPatterns.some(cta => description.toLowerCase().includes(cta))) {
+              score += 30;
+            }
+            
+            return Math.min(score, 100);
+          };
+          
+          const checkSlugScore = (slug, keywords) => {
+            if (!slug) return 0;
+            let score = 0;
+            
+            // Panjang slug yang optimal
+            if (slug.length >= 5 && slug.length <= 50) {
+              score += 40;
+            } else if (slug.length > 3 && slug.length < 60) {
+              score += 20;
+            }
+            
+            // Mengandung kata kunci utama
+            if (keywords && keywords.length > 0) {
+              const keywordList = keywords.split(',').map(k => k.trim().toLowerCase());
+              const slugLower = slug.toLowerCase();
+              for (const kw of keywordList) {
+                const kwSimplified = kw.replace(/\s+/g, '-');
+                if (slugLower.includes(kwSimplified)) {
+                  score += 60;
+                  break;
+                }
+              }
+            }
+            
+            return Math.min(score, 100);
+          };
+          
           // Get values to check
           const title = data.seo?.metaTitle || data.title || '';
           const description = data.seo?.metaDescription || '';
@@ -319,9 +410,9 @@
           const content = data.body || '';
           
           // Calculate scores
-          const titleScore = this.checkTitleScore(title, keywords);
-          const descriptionScore = this.checkDescriptionScore(description, keywords);
-          const slugScore = this.checkSlugScore(slug, keywords);
+          const titleScore = checkTitleScore(title, keywords);
+          const descriptionScore = checkDescriptionScore(description, keywords);
+          const slugScore = checkSlugScore(slug, keywords);
           
           const totalScore = (titleScore + descriptionScore + slugScore) / 3;
           const scoreClass = totalScore > 80 ? 'good' : (totalScore > 60 ? 'average' : 'poor');
@@ -348,189 +439,40 @@
           const html = `
             <div style="margin-bottom: 15px;">
               <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <div style="width: 40px; height: 40px; border-radius: 50%; background-color: ${scoreClass === 'good' ? '#0A8217' : (scoreClass === 'average' ? '#F79009' : '#D7260F')}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px;">
-                  ${Math.round(totalScore)}
-                </div>
-                <div>
-                  <div style="font-weight: bold;">SEO Score</div>
-                  <div style="font-size: 12px;">${scoreClass === 'good' ? 'Baik' : (scoreClass === 'average' ? 'Cukup' : 'Perlu Perbaikan')}</div>
-                </div>
-              </div>
-              
-              <div style="margin-bottom: 10px;">
-                <div style="font-weight: bold; margin-bottom: 5px;">Google Preview</div>
-                <div class="seo-preview-google">
-                  <div class="title">${title || 'Judul Artikel'}</div>
-                  <div class="url">https://singrank.com/blog/${slug || 'url-artikel'}</div>
-                  <div class="description">${description || 'Deskripsi artikel belum diisi. Tambahkan meta description untuk meningkatkan SEO.'}</div>
+                <div style="font-weight: bold; margin-right: 10px;">SEO Score: ${Math.round(totalScore)}%</div>
+                <div class="seo-score">
+                  <div class="seo-score-indicator seo-score-${scoreClass}"></div>
+                  <div style="margin-left: 5px;">${scoreClass === 'good' ? 'Good' : (scoreClass === 'average' ? 'Average' : 'Needs Improvement')}</div>
                 </div>
               </div>
               
               <div>
-                <div style="font-weight: bold; margin-bottom: 5px;">Tips Peningkatan:</div>
-                <ul style="padding-left: 20px; margin-top: 5px; font-size: 13px;">
-                  ${tips.map(tip => `<li>${tip}</li>`).join('')}
-                </ul>
+                <div style="margin-bottom: 8px;"><strong>Title:</strong> ${title} (${Math.round(titleScore)}%)</div>
+                <div style="margin-bottom: 8px;"><strong>Description:</strong> ${description} (${Math.round(descriptionScore)}%)</div>
+                <div style="margin-bottom: 8px;"><strong>URL Slug:</strong> ${slug} (${Math.round(slugScore)}%)</div>
               </div>
+              
+              ${tips.length > 0 ? `
+                <div style="margin-top: 10px;">
+                  <strong>Tips for improvement:</strong>
+                  <ul style="margin-top: 5px; padding-left: 20px;">
+                    ${tips.map(tip => `<li>${tip}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
             </div>
           `;
           
           const el = document.createElement('div');
           el.innerHTML = html;
-          
           return el;
         },
+        
         preview: () => {
           return null;
         }
       });
     });
-    
-    // Fungsi pengecekan SEO
-    function checkTitleScore(title, keywords) {
-      if (!title) return 0;
-      if (!keywords) return 50;
-      
-      const keywordArr = keywords.split(',').map(k => k.trim().toLowerCase());
-      const titleLower = title.toLowerCase();
-      
-      let score = 0;
-      
-      // Panjang judul optimal
-      const length = title.length;
-      if (length >= 40 && length <= 60) {
-        score += 30;
-      } else if (length > 30 && length < 70) {
-        score += 20;
-      } else {
-        score += 10;
-      }
-      
-      // Kata kunci dalam judul
-      let keywordFound = false;
-      for (const keyword of keywordArr) {
-        if (titleLower.includes(keyword)) {
-          keywordFound = true;
-          if (titleLower.startsWith(keyword)) {
-            score += 50; // Kata kunci di awal
-            break;
-          } else {
-            score += 30; // Kata kunci di tengah/akhir
-          }
-        }
-      }
-      
-      if (!keywordFound) {
-        score += 10;
-      }
-      
-      // Brand name di akhir
-      if (titleLower.endsWith('singrank') || titleLower.includes('| singrank')) {
-        score += 20;
-      }
-      
-      return Math.min(100, score);
-    }
-    
-    function checkDescriptionScore(description, keywords) {
-      if (!description) return 0;
-      if (!keywords) return 50;
-      
-      const keywordArr = keywords.split(',').map(k => k.trim().toLowerCase());
-      const descLower = description.toLowerCase();
-      
-      let score = 0;
-      
-      // Panjang description optimal
-      const length = description.length;
-      if (length >= 145 && length <= 160) {
-        score += 30;
-      } else if (length > 120 && length < 180) {
-        score += 20;
-      } else {
-        score += 10;
-      }
-      
-      // Kata kunci dalam description
-      let keywordFound = false;
-      for (const keyword of keywordArr) {
-        if (descLower.includes(keyword)) {
-          keywordFound = true;
-          score += 30;
-          break;
-        }
-      }
-      
-      if (!keywordFound) {
-        score += 10;
-      }
-      
-      // Call to action
-      const ctaPhrases = ['pelajari', 'kunjungi', 'baca', 'temukan', 'dapatkan', 'coba', 'lihat'];
-      let ctaFound = false;
-      for (const cta of ctaPhrases) {
-        if (descLower.includes(cta)) {
-          ctaFound = true;
-          score += 20;
-          break;
-        }
-      }
-      
-      if (!ctaFound) {
-        score += 5;
-      }
-      
-      // Terlalu banyak karakter berulang
-      const repeatedChars = /([^\s])\1{3,}/g;
-      if (repeatedChars.test(descLower)) {
-        score -= 20;
-      }
-      
-      return Math.min(100, Math.max(0, score));
-    }
-    
-    function checkSlugScore(slug, keywords) {
-      if (!slug) return 0;
-      if (!keywords) return 50;
-      
-      const keywordArr = keywords.split(',').map(k => k.trim().toLowerCase().replace(/\s+/g, '-'));
-      const slugLower = slug.toLowerCase();
-      
-      let score = 0;
-      
-      // Panjang slug optimal
-      const length = slug.length;
-      if (length >= 20 && length <= 50) {
-        score += 30;
-      } else if (length > 10 && length < 70) {
-        score += 20;
-      } else {
-        score += 10;
-      }
-      
-      // Kata kunci dalam slug
-      let keywordFound = false;
-      for (const keyword of keywordArr) {
-        if (slugLower.includes(keyword)) {
-          keywordFound = true;
-          score += 50;
-          break;
-        }
-      }
-      
-      if (!keywordFound) {
-        score += 10;
-      }
-      
-      // Format slug yang baik (huruf kecil, hanya huruf/angka/dash)
-      if (/^[a-z0-9-]+$/.test(slugLower)) {
-        score += 20;
-      } else {
-        score -= 20;
-      }
-      
-      return Math.min(100, Math.max(0, score));
-    }
   </script>
   
   <!-- Auto-generate Schema Script -->
