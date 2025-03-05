@@ -4,7 +4,14 @@ import { Inter, Montserrat, Poppins, Raleway } from 'next/font/google'
 import './globals.css'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import ChatTerminal from './components/ChatTerminal'
+import dynamic from 'next/dynamic'
+
+// Dynamically import components with browser-only features
+// This prevents hydration errors by ensuring they only load on the client
+const ChatTerminal = dynamic(() => import('./components/ChatTerminal'), { 
+  ssr: false, 
+  loading: () => <div className="hidden lg:block fixed bottom-6 right-6 z-50 opacity-0"></div> 
+})
 
 // Optimize font loading with display: swap
 const fontOption1 = Montserrat({
@@ -97,7 +104,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${primaryFont.variable}`}>
+    <html lang="en" className={`${primaryFont.variable} scroll-smooth`}>
       <head>
         {/* Preconnect to critical origins */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -105,6 +112,14 @@ export default function RootLayout({
         
         {/* Preload critical assets */}
         <link rel="preload" href="/images/logo.png" as="image" />
+        
+        {/* Add meta tag to prevent flash of unstyled content */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          html {
+            visibility: visible;
+            opacity: 1;
+          }
+        `}} />
       </head>
       <body className="font-sans">
         <div className="min-h-screen flex flex-col">

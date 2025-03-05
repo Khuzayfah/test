@@ -139,13 +139,13 @@ const blogPosts = [
 export default function BlogPost() {
   const params = useParams();
   const router = useRouter();
-  const postId = params.id as string;
+  const postId = params?.id ? (params.id as string) : '';
   
   // Find the post with the matching ID
   const post = blogPosts.find(post => post.id === postId);
   
-  // If no post is found, redirect to the blog index
-  if (!post) {
+  // If no post is found or postId is empty, redirect to the blog index
+  if (!post || !postId) {
     // We would normally handle this server-side, but for this client-side demo:
     router.push('/blog');
     return null;
@@ -378,31 +378,19 @@ export default function BlogPost() {
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                       className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 group border border-gray-100"
                     >
-                      <Link href={`/blog/${relatedPost.id}`} className="block h-full">
-                        <div className="relative h-40 overflow-hidden">
-                          <div className="h-full w-full bg-gray-200 bg-gradient-to-br from-[#f5f5f5] to-[#e0e0e0]">
-                            <div className="absolute top-3 left-3">
-                              <span className="inline-block px-2.5 py-1 bg-white/90 backdrop-blur-sm text-[#d13239] rounded-full text-xs font-medium">
-                                {relatedPost.category}
-                              </span>
-                            </div>
-                          </div>
+                      <Link href={`/blog/${relatedPost.id}`} className="block">
+                        <div className="h-32 overflow-hidden rounded-t-xl">
+                          <Image
+                            src={relatedPost.author.image}
+                            alt={relatedPost.title}
+                            width={128}
+                            height={128}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <div className="p-5">
-                          <div className="flex items-center text-xs text-gray-500 mb-3">
-                            <span className="flex items-center mr-3">
-                              <FiCalendar className="mr-1" size={12} />
-                              {relatedPost.date}
-                            </span>
-                            <span className="flex items-center">
-                              <FiClock className="mr-1" size={12} />
-                              {relatedPost.readTime}
-                            </span>
-                          </div>
-                          <h3 className="text-lg font-bold mb-2 text-gray-900 group-hover:text-[#d13239] transition-colors line-clamp-2">
-                            {relatedPost.title}
-                          </h3>
-                          <p className="text-gray-600 text-sm line-clamp-2">{relatedPost.description}</p>
+                        <div className="p-4">
+                          <h3 className="text-xl font-bold text-gray-900 mb-1">{relatedPost.title}</h3>
+                          <p className="text-sm text-gray-500">{relatedPost.description}</p>
                         </div>
                       </Link>
                     </motion.div>
@@ -413,42 +401,6 @@ export default function BlogPost() {
           </div>
         </section>
       )}
-      
-      {/* Newsletter CTA */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="max-w-5xl mx-auto rounded-2xl overflow-hidden relative"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#d13239] to-[#a61b22] opacity-95"></div>
-            <div className="relative z-10 px-6 py-12 md:p-12 text-center">
-              <h2 className="text-3xl font-bold mb-4 text-white">Want to stay updated?</h2>
-              <p className="text-white/80 mb-8 max-w-2xl mx-auto">
-                Join our newsletter to receive the latest insights and industry trends straight to your inbox.
-              </p>
-              <div className="max-w-md mx-auto">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <input 
-                    type="email" 
-                    placeholder="Your email address" 
-                    className="flex-grow px-4 py-3 rounded-md border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
-                  />
-                  <button className="whitespace-nowrap px-6 py-3 bg-white text-[#d13239] font-bold rounded-md shadow-lg hover:bg-gray-100 transition-all duration-300">
-                    Subscribe
-                  </button>
-                </div>
-                <p className="text-xs text-white/60 mt-3">
-                  We respect your privacy. Unsubscribe at any time.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
     </main>
   );
-} 
+}

@@ -16,6 +16,8 @@ const nextConfig = {
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    // Add styledComponents support for better hydration
+    styledComponents: true,
   },
   poweredByHeader: false,
   // Optimize output for Vercel deployment
@@ -25,10 +27,15 @@ const nextConfig = {
     '@/components': {
       transform: '@/components/{{member}}',
     },
+    'react-icons': {
+      transform: 'react-icons/{{member}}',
+    },
   },
   // Enable gzip compression for better performance
   compress: true,
-  // Enable HTTP/2 server push for critical assets
+  // Fixes hydration issues by skipping trailing slash redirect
+  skipTrailingSlashRedirect: true,
+  // Configure experimental features for better performance and hydration
   experimental: {
     // Enable React Server Components optimizations
     serverComponentsExternalPackages: [],
@@ -38,6 +45,8 @@ const nextConfig = {
     scrollRestoration: true,
     // Code splitting optimizations
     optimizePackageImports: ['react-icons', 'framer-motion', 'react-dom'],
+    // Improve middleware performance
+    instrumentationHook: true,
   },
   // Configure headers for better security and performance
   async headers() {
@@ -57,9 +66,10 @@ const nextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
+          // Use more specific Cache-Control for HTML pages
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=3600, s-maxage=86400', // 1 hour browser, 1 day CDN
           },
         ],
       },
@@ -72,7 +82,36 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/(.*).(js|css)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ];
+  },
+  // Improve webpack configuration for faster builds and better performance
+  webpack: (config, { dev, isServer }) => {
+    // Optimize production builds
+    if (!dev && !isServer) {
+      // Enable tree shaking
+      config.optimization.usedExports = true;
+      
+      // Minimize bundle size
+      config.optimization.minimize = true;
+      
+      // Improve chunk splitting
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        maxInitialRequests: 25,
+        minSize: 20000,
+      };
+    }
+    
+    return config;
   },
 }
 

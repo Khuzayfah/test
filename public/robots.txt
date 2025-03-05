@@ -1,14 +1,10 @@
-# Allow all web crawlers to access the entire site
+# *
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://singrank.sg.com/sitemap.xml
+# Host
+Host: https://singrank.com
 
-# Crawl delay to prevent server overload
-Crawl-delay: 1
-
-# Disallow crawling of administrative pages
-User-agent: *
-Disallow: /admin/
-Disallow: /api/ 
+# Sitemaps
+Sitemap: https://singrank.com/sitemap.xml
+Sitemap: https://singrank.com/server-sitemap.xml

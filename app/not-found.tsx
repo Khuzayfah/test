@@ -1,34 +1,49 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import Link from 'next/link';
 
+/**
+ * Custom 404 Not Found Page
+ * 
+ * A user-friendly page shown when users navigate to a route that doesn't exist.
+ * Provides helpful links to get back on track.
+ */
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gray-900 px-6 py-24 sm:py-32 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="mx-auto max-w-2xl text-center"
-      >
-        <p className="text-base font-semibold text-[#7857FF]">404</p>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-100 sm:text-5xl">Page not found</h1>
-        <p className="mt-6 text-base leading-7 text-gray-300">
-          Sorry, we couldn't find the page you're looking for.
-        </p>
-        <div className="mt-10 flex items-center justify-center gap-x-6">
-          <a
-            href="/"
-            className="rounded-md bg-gradient-to-r from-[#7857FF] to-[#1F69FF] px-3.5 py-2.5 text-sm font-semibold text-white shadow-lg hover:shadow-[#7857FF]/20 hover:from-[#8A6CFF] hover:to-[#4F89FF] transition-all duration-300"
-          >
-            Go back home
-          </a>
-          <a href="/contact" className="text-sm font-semibold text-[#7857FF] hover:text-[#1F69FF] transition-all duration-300">
-            Contact support <span aria-hidden="true">&rarr;</span>
-          </a>
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+      <div className="max-w-md w-full text-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg border border-luxury-red-100">
+          <div className="w-20 h-20 bg-luxury-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-4xl text-luxury-red-600">404</span>
+          </div>
+          
+          <h1 className="text-3xl font-bold text-gray-800 mb-3">
+            Page Not Found
+          </h1>
+          
+          <p className="text-gray-600 mb-8">
+            The page you are looking for might have been removed, had its name changed, 
+            or is temporarily unavailable.
+          </p>
+          
+          <div className="space-y-3">
+            <Link
+              href="/"
+              className="block w-full px-4 py-3 bg-luxury-red-600 text-white rounded-md hover:bg-luxury-red-700 transition-colors"
+            >
+              Return to Homepage
+            </Link>
+            
+            <Link
+              href="/contact"
+              className="block w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            >
+              Contact Support
+            </Link>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 } 

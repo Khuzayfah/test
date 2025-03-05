@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import ServiceModal from '../components/ServiceModal';
+import Image from 'next/image';
 
 // Dynamically import components for performance
 const ParticlesContainer = dynamic(() => import('../components/ParticlesContainer'), {
@@ -648,6 +649,156 @@ export default function Services() {
           isMobile={isMobile}
         />
       )}
+
+      {/* Team Section */}
+      <div className="bg-gray-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true, margin: "-100px" }}
+            className="max-w-4xl mx-auto text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Our <span className="text-[#d13239]">Team</span></h2>
+            <p className="text-xl text-gray-700 mb-8">
+              Meet the experts who will drive your digital success through innovation and expertise.
+            </p>
+            <div className="h-1 w-24 bg-[#d13239] mx-auto"></div>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+            {/* Team Member 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col h-full"
+            >
+              <div className="w-full h-64 relative overflow-hidden">
+                <Image 
+                  src="/team/founder.jpg" 
+                  fill
+                  style={{objectFit: 'cover'}}
+                  alt="Khuzayfah Redo" 
+                  className="transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="p-6 flex-grow">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">Khuzayfah Redo</h3>
+                <p className="text-[#d13239] font-medium mb-3">SEO & Founder</p>
+                <p className="text-gray-700 mb-4">
+                  Co-Founder of Oneiros and SEO Expert with comprehensive expertise in digital marketing, AI integration, and frontend development.
+                </p>
+                <div className="mt-auto">
+                  <h4 className="font-medium text-gray-900 mb-2">Specialties:</h4>
+                  <ul className="space-y-1">
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      SEO & AEO Expert
+                    </li>
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      Digital Marketing Strategist
+                    </li>
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      Frontend Development
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Team Member 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true, margin: "-100px" }}
+              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col h-full"
+            >
+              <div className="w-full h-64 relative overflow-hidden">
+                <Image 
+                  src="/team/tech-lead.jpg" 
+                  fill
+                  style={{objectFit: 'cover'}}
+                  alt="Jekriando Michael" 
+                  className="transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="p-6 flex-grow">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">Jekriando Michael</h3>
+                <p className="text-[#d13239] font-medium mb-3">Oneiros Co-Founder & Tech Lead</p>
+                <p className="text-gray-700 mb-4">
+                  Co-Founder of Oneiros and Technical Lead with extensive experience in full-stack development, system architecture, and database management.
+                </p>
+                <div className="mt-auto">
+                  <h4 className="font-medium text-gray-900 mb-2">Specialties:</h4>
+                  <ul className="space-y-1">
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      Fullstack Development
+                    </li>
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      Backend Architecture
+                    </li>
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      System Architecture
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Team Member 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true, margin: "-100px" }}
+              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col h-full"
+            >
+              <div className="w-full h-64 relative overflow-hidden">
+                <Image 
+                  src="/team/content-strategist.jpg" 
+                  fill
+                  style={{objectFit: 'cover'}}
+                  alt="Wahyu Wedy" 
+                  className="transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="p-6 flex-grow">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">Wahyu Wedy</h3>
+                <p className="text-[#d13239] font-medium mb-3">Social Media Expert</p>
+                <p className="text-gray-700 mb-4">
+                  Social Media Management specialist with a proven track record in building and managing successful social media campaigns and community engagement strategies.
+                </p>
+                <div className="mt-auto">
+                  <h4 className="font-medium text-gray-900 mb-2">Specialties:</h4>
+                  <ul className="space-y-1">
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      Social Media Management
+                    </li>
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      Content Creation
+                    </li>
+                    <li className="text-sm flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-[#d13239] rounded-full mr-2"></span>
+                      Campaign Strategy
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 } 

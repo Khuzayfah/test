@@ -435,74 +435,12 @@ Message: ${formData.message}
       {/* Contact Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Contact Information */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-1"
-            >
-              <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-                <h2 className="text-2xl font-bold text-luxury-red-700 mb-6">Contact Information</h2>
-                
-                <div className="space-y-6">
-                  <div className="flex items-start">
-                    <div className="text-luxury-red-600 mr-4 mt-1">
-                      <FaMapMarkerAlt size={20} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Our Location</h3>
-                      <p className="text-gray-600 mt-1">123 Business Avenue, Singapore 123456</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="text-luxury-red-600 mr-4 mt-1">
-                      <FaPhoneAlt size={20} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Phone Number</h3>
-                      <p className="text-gray-600 mt-1">+65 1234 5678</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="text-luxury-red-600 mr-4 mt-1">
-                      <FaEnvelope size={20} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Email Address</h3>
-                      <p className="text-gray-600 mt-1">info@yourcompany.com</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="text-luxury-red-600 mr-4 mt-1">
-                      <FaWhatsapp size={20} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">WhatsApp</h3>
-                      <p className="text-gray-600 mt-1">+65 8765 4321</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <h3 className="font-semibold text-gray-900 mb-2">Business Hours</h3>
-                  <p className="text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM</p>
-                  <p className="text-gray-600">Saturday: 10:00 AM - 4:00 PM</p>
-                  <p className="text-gray-600">Sunday: Closed</p>
-                </div>
-              </div>
-            </motion.div>
-            
+          <div className="max-w-3xl mx-auto">
             {/* Chatbot Interface */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="lg:col-span-2"
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
               <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
                 {/* Terminal Header */}
@@ -564,7 +502,7 @@ Message: ${formData.message}
                         value={userInput}
                         onChange={(e) => setUserInput(e.target.value)}
                         placeholder="Type your response here..."
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-luxury-red-500 focus:border-transparent"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-luxury-red-500 focus:border-transparent text-black"
                         disabled={isSubmitting}
                       />
                       <button
