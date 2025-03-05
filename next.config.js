@@ -23,14 +23,10 @@ const nextConfig = {
   experimental: {
     // Enable React Server Components optimizations
     serverComponentsExternalPackages: [],
-    // Enable optimized font loading
-    optimizeFonts: true,
-    // Enable modern bundle splitting
-    bundlePagesDir: false,
-    // Reduce bundle size
-    staticallyExtractDynamicImageImports: true,
     // Minimize server-components
     optimizeServerReact: true,
+    // Newer more specific options replacing deprecated ones
+    optimizeCss: true,  // Enabled now that 'critters' package is installed
   },
 }
 

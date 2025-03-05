@@ -9,12 +9,22 @@ import Particles from "react-tsparticles";
  * 
  * A background component with animated particles using red and white colors (Singapore flag colors)
  * Creates an elegant, professional effect with particles that move and connect
+ * 
+ * Optimized for better performance:
+ * - Reduced FPS limit
+ * - Reduced particle count
+ * - Simplified particle shapes
+ * - Disabled collisions
  */
 const ParticlesContainer = () => {
   // Initialize the tsParticles instance
   const particlesInit = useCallback(async (engine: any) => {
-    // Use loadSlim for a simpler, more compatible implementation
-    await loadSlim(engine);
+    try {
+      // Use loadSlim for a simpler, more compatible implementation
+      await loadSlim(engine);
+    } catch (error) {
+      console.error("Failed to initialize particles:", error);
+    }
   }, []);
 
   return (

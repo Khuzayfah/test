@@ -3,11 +3,17 @@
  * 
  * Popup modal for displaying service details with animations
  * and styling that matches the main red and white theme.
+ * 
+ * Optimized for performance:
+ * - Uses memo to prevent unnecessary re-renders
+ * - Optimized animations with lighter easing functions
+ * - Properly handles DOM event cleanup
+ * - Uses layoutId for smoother animations
  */
 
 'use client';
 
-import React, { useEffect, memo } from 'react';
+import React, { useEffect, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Types for our service details
@@ -30,12 +36,13 @@ interface ServiceModalProps {
 }
 
 const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, isMobile }) => {
+  // Use callback for handling the escape key
+  const handleEsc = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  }, [onClose]);
+  
   // Handle ESC key to close modal
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    
     // Prevent scrolling when modal is open
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -46,16 +53,16 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleEsc);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleEsc]);
 
   // Animation variants - optimized for performance
   const backdropVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1 }
+    visible: { opacity: 1, transition: { duration: 0.2 } }
   };
   
   const modalVariants = {
-    hidden: { opacity: 0, y: 50, scale: 0.95 },
+    hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: { 
       opacity: 1, 
       y: 0, 
@@ -63,7 +70,8 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
       transition: { 
         type: "spring", 
         damping: 25, 
-        stiffness: 300 
+        stiffness: 300,
+        duration: 0.3
       }
     },
     exit: { 
@@ -133,7 +141,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
   };
 
   return (
-    <>
+    <AnimatePresence>
       {isOpen && service && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto"
@@ -156,7 +164,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
               variants={modalVariants}
               initial="hidden"
               animate="visible"
-              exit="hidden"
+              exit="exit"
               onClick={(e) => e.stopPropagation()}
               layoutId={`service-${service.id}`}
             >
@@ -212,7 +220,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
                 <div className="mb-4">
                   <h4 className="text-lg font-semibold text-[#d13239] mb-2">Our Process</h4>
                   <div className="space-y-3">
-                    {service.process.map((step, index) => (
+                    {service.process && service.process.map((step, index) => (
                       <div key={index} className="border-l-2 border-[#d13239] pl-4 mb-2">
                         <h5 className="font-medium text-md text-gray-900">{step.step}</h5>
                         <p className="text-sm text-gray-700">{step.description}</p>
@@ -236,7 +244,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ isOpen, onClose, service, i
           </div>
         </div>
       )}
-    </>
+    </AnimatePresence>
   );
 };
 
