@@ -1,14 +1,19 @@
+import Script from 'next/script';
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+        <Script 
+          src="https://identity.netlify.com/v1/netlify-identity-widget.js"
+          strategy="afterInteractive"
+        />
       </head>
       <body>
         {children}
         
-        <script dangerouslySetInnerHTML={{
-          __html: `
+        <Script id="netlify-identity-widget-init" strategy="afterInteractive">
+          {`
             if (window.netlifyIdentity) {
               window.netlifyIdentity.on("init", user => {
                 if (!user) {
@@ -18,8 +23,8 @@ export default function RootLayout({ children }) {
                 }
               });
             }
-          `
-        }} />
+          `}
+        </Script>
       </body>
     </html>
   );
