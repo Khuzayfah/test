@@ -66,35 +66,27 @@ const headerItemVariants = {
 const teamMembers = [
   {
     id: 1,
-    name: 'Sarah Chen',
+    name: 'Khuzayfah Redo',
     position: 'CEO & Founder',
-    bio: 'Former Google strategist with 10+ years in digital marketing and SEO optimization.',
+    bio: 'SEO Specialist & Front-end Developer with expertise in modern web technologies and digital marketing strategies.',
     image: '/team/founder.jpg',
     iconType: 'leader'
   },
   {
     id: 2,
-    name: 'David Wong',
-    position: 'SEO Director',
-    bio: 'SEO specialist with experience optimizing websites for multinational companies across Asia.',
-    image: '/team/seo-specialist.jpg',
-    iconType: 'seo'
+    name: 'Jack Ando Michael',
+    position: 'Backend Developer',
+    bio: 'Expert in backend development and API integration, creating robust and scalable solutions.',
+    image: '/team/tech-lead.jpg',
+    iconType: 'tech'
   },
   {
     id: 3,
-    name: 'Michelle Tan',
-    position: 'Content Strategist',
-    bio: 'Award-winning content creator specializing in creating engaging content that ranks.',
+    name: 'Wahyu We Die',
+    position: 'Social Media Specialist',
+    bio: 'Creative social media strategist with a passion for building engaging online communities.',
     image: '/team/content-strategist.jpg',
     iconType: 'content'
-  },
-  {
-    id: 4,
-    name: 'Raj Kumar',
-    position: 'Technical SEO Lead',
-    bio: 'Expert in technical SEO with a background in web development and site optimization.',
-    image: '/team/tech-lead.jpg',
-    iconType: 'tech'
   }
 ];
 
@@ -254,13 +246,13 @@ export default function AboutPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-white">
       {/* Hero Section with Particles Background */}
-      <section className="relative h-[80vh] flex items-center justify-center bg-gradient-to-r from-[#0a0a0a] to-[#262626] text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
+      <section className="relative h-[80vh] flex items-center justify-center bg-gradient-to-r from-gray-50 to-white text-gray-900 overflow-hidden">
+        <div className="absolute inset-0 opacity-70">
           {/* Use ClientParticles component to prevent hydration errors */}
-          {isMounted ? <ClientParticles /> : <div className="absolute inset-0 bg-gradient-to-b from-[#202020] to-[#333333]"></div>}
+          {isMounted ? <ClientParticles /> : <div className="absolute inset-0 bg-gradient-to-b from-gray-100 to-white"></div>}
         </div>
         
-        <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: 'url(/images/singapore-skyline.jpg)' }}></div>
+        <div className="absolute inset-0 bg-cover bg-center opacity-5" style={{ backgroundImage: 'url(/images/singapore-skyline.jpg)' }}></div>
         
         <motion.div 
           style={{ opacity, scale }}
@@ -269,7 +261,7 @@ export default function AboutPage() {
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="text-white/50"
+            className="text-gray-400"
           >
             <IoIosArrowDown size={30} />
           </motion.div>
@@ -288,7 +280,7 @@ export default function AboutPage() {
               variants={headerItemVariants}
               className="mb-6 inline-block"
             >
-              <span className="inline-flex items-center px-4 py-1 rounded-full bg-[#d13239]/20 text-white text-sm font-medium backdrop-blur-sm">
+              <span className="inline-flex items-center px-4 py-1 rounded-full bg-[#d13239]/10 text-gray-900 text-sm font-medium backdrop-blur-sm">
                 <BsStars className="mr-1" /> Singapore's Premier Agency
               </span>
             </motion.div>
@@ -302,7 +294,7 @@ export default function AboutPage() {
             
             <motion.p
               variants={headerItemVariants}
-              className="text-xl max-w-3xl mx-auto text-white/80"
+              className="text-xl max-w-3xl mx-auto text-gray-700"
             >
               Driving digital success for businesses across Singapore with data-driven strategies and innovative solutions.
             </motion.p>
@@ -386,7 +378,7 @@ export default function AboutPage() {
       </section>
 
       {/* Company Values Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -412,13 +404,14 @@ export default function AboutPage() {
                 viewport={{ once: true, margin: "-100px" }}
                 whileHover={{ 
                   y: -5,
+                  scale: 1.02,
                   transition: { duration: 0.2 }
                 }}
-                className="bg-white rounded-lg shadow-lg overflow-hidden h-full"
+                className="bg-white rounded-lg shadow-xl overflow-hidden h-full border border-gray-100 hover:border-[#d13239]/20"
               >
                 <div className={`h-2 bg-gradient-to-r ${value.color}`}></div>
                 <div className="p-6">
-                  <div className="w-12 h-12 mb-4 bg-[#d13239]/10 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 mb-4 bg-[#d13239]/10 rounded-lg flex items-center justify-center transform transition-transform duration-300 group-hover:scale-110">
                     {renderIconPath(value.iconType)}
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-gray-900">{value.name}</h3>
@@ -447,7 +440,7 @@ export default function AboutPage() {
             <div className="h-1 w-24 bg-[#d13239] mx-auto"></div>
           </motion.div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-3 gap-8">
             {teamMembers.map((member, index) => (
               <motion.div 
                 key={member.id}
@@ -458,31 +451,30 @@ export default function AboutPage() {
                 viewport={{ once: true, margin: "-100px" }}
                 whileHover={{ 
                   y: -5,
+                  scale: 1.02,
                   transition: { duration: 0.2 }
                 }}
                 onClick={() => openTeamMemberDetails(member)}
-                className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer h-full"
+                className="bg-white rounded-lg shadow-xl overflow-hidden cursor-pointer h-full border border-gray-100 hover:border-[#d13239]/20"
               >
-                <div className="relative h-64 overflow-hidden bg-gray-300">
-                  {/* Using a background color as fallback instead of relying on external images */}
-                  <div className="w-full h-full bg-gradient-to-r from-gray-300 to-gray-200 flex items-center justify-center">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 rounded-full bg-gray-400 mb-2 flex items-center justify-center text-white text-2xl font-bold">
+                <div className="relative h-72 overflow-hidden bg-gradient-to-r from-gray-100 to-gray-200">
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="flex flex-col items-center text-center p-6">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[#d13239] to-[#e64c4c] mb-4 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
                         {member.name.charAt(0)}
                       </div>
-                      <div className="text-gray-600 text-sm px-4">{member.position}</div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{member.name}</h3>
+                      <p className="text-[#d13239] font-medium mb-4">{member.position}</p>
+                      <div className="w-12 h-1 bg-[#d13239] mb-4"></div>
+                      <p className="text-gray-600">{member.bio}</p>
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <p className="text-white text-sm">{member.position}</p>
-                    <h3 className="text-white text-xl font-semibold">{member.name}</h3>
-                  </div>
                 </div>
-                <div className="p-4">
-                  <div className="flex items-center">
-                    <div className="mr-3">{renderIconPath(member.iconType)}</div>
-                    <p className="text-gray-600 line-clamp-2">{member.bio}</p>
+                <div className="p-4 bg-white border-t border-gray-100">
+                  <div className="flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-[#d13239]/10 flex items-center justify-center">
+                      {renderIconPath(member.iconType)}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -492,7 +484,7 @@ export default function AboutPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-r from-[#0a0a0a] to-[#262626] text-white">
+      <section className="py-20 bg-gradient-to-r from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -501,8 +493,8 @@ export default function AboutPage() {
             viewport={{ once: true, margin: "-100px" }}
             className="max-w-4xl mx-auto text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Our <span className="text-[#d13239]">Impact</span></h2>
-            <p className="text-xl text-white/80 mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">Our <span className="text-[#d13239]">Impact</span></h2>
+            <p className="text-xl text-gray-700 mb-8">
               Numbers that tell the story of our commitment to excellence and client success.
             </p>
             <div className="h-1 w-24 bg-[#d13239] mx-auto"></div>
@@ -516,10 +508,11 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true, margin: "-100px" }}
-                className="p-6"
+                whileHover={{ scale: 1.05 }}
+                className="p-6 bg-white rounded-lg shadow-lg border border-gray-100 hover:border-[#d13239]/20"
               >
                 <h3 className="text-4xl md:text-5xl font-bold text-[#d13239] mb-2">{stat.number}</h3>
-                <p className="text-lg text-white/80">{stat.label}</p>
+                <p className="text-lg text-gray-700">{stat.label}</p>
               </motion.div>
             ))}
           </div>
