@@ -1,23 +1,33 @@
 import React from 'react'
 import type { Metadata, Viewport } from 'next'
-import { Playfair_Display, Montserrat } from 'next/font/google'
+import { Inter, Montserrat, Poppins, Raleway } from 'next/font/google'
 import './globals.css'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import ChatTerminal from './components/ChatTerminal'
 
-// Elegant serif font for headings
-const playfair = Playfair_Display({ 
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-playfair',
-})
-
-// Clean sans-serif font for body text
-const montserrat = Montserrat({ 
+// Choose one of these professional font options:
+const fontOption1 = Montserrat({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-montserrat',
 })
+
+const fontOption2 = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-poppins',
+})
+
+const fontOption3 = Raleway({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-raleway',
+})
+
+// Pick one of the above fonts to use as your primary font
+const primaryFont = fontOption2 // Using Poppins in this example
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -78,14 +88,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${montserrat.variable}`}>
-      <body className={montserrat.className}>
+    <html lang="en" className={`${primaryFont.variable}`}>
+      <body className="font-sans">
         <div className="min-h-screen flex flex-col">
           <Navbar />
           <main className="flex-grow">
             {children}
           </main>
           <Footer />
+          <ChatTerminal />
         </div>
       </body>
     </html>

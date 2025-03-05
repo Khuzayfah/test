@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const { fontFamily } = require('tailwindcss/defaultTheme');
+
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -86,6 +88,24 @@ module.exports = {
           '0%, 100%': { opacity: 1 },
           '50%': { opacity: 0.85 },
         },
+      },
+      fontFamily: {
+        // Choose one of these font combinations:
+        
+        // Option 1: Montserrat for headings, Open Sans for body
+        sans: ['Montserrat', ...fontFamily.sans],
+        body: ['Open Sans', ...fontFamily.sans],
+        
+        // Option 2: Poppins for everything (clean, modern)
+        sans: ['Poppins', ...fontFamily.sans],
+        
+        // Option 3: Raleway for headings, Roboto for body
+        sans: ['Raleway', ...fontFamily.sans],
+        body: ['Roboto', ...fontFamily.sans],
+        
+        // Option 4: Playfair Display for headings, Source Sans Pro for body (elegant)
+        serif: ['Playfair Display', ...fontFamily.serif],
+        sans: ['Source Sans Pro', ...fontFamily.sans],
       },
     },
   },
