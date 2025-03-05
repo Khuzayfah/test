@@ -2,9 +2,34 @@ backend:
   name: git-gateway
   branch: main # Branch to update (defaults to master)
   repo: Khuzayfah/test # Your GitHub username/repo
+  auth_scope: repo # Permintaan akses penuh ke repositori
+  api_root: https://api.github.com # Pastikan endpoint API GitHub digunakan
+  commit_messages:
+    create: 'Create {{collection}} "{{slug}}"'
+    update: 'Update {{collection}} "{{slug}}"'
+    delete: 'Delete {{collection}} "{{slug}}"'
+    uploadMedia: 'Upload "{{path}}"'
+    deleteMedia: 'Delete "{{path}}"'
 
+# CMS Local Development
+local_backend: true
+
+# Media settings
 media_folder: "public/images/uploads" # Media files will be stored here
 public_folder: "/images/uploads" # The src attribute for uploaded media
+media_library:
+  max_file_size: 5000000 # 5MB - untuk optimasi gambar
+
+# Editorial Workflow - untuk proses review dan approval
+publish_mode: editorial_workflow
+
+# Preview Templates
+site_url: http://localhost:3000
+display_url: http://localhost:3000
+logo_url: /images/singrank-logo.png
+
+# Preview Templates
+show_preview_links: true
 
 collections:
   - name: "blog" # Used in routes, e.g., /admin/collections/blog
@@ -12,8 +37,129 @@ collections:
     folder: "content/blog" # The path to the folder where the documents are stored
     create: true # Allow users to create new documents in this collection
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}" # Filename template
+    summary: "{{title}} - {{date | date('YYYY-MM-DD')}}"
+    preview_path: "blog/{{slug}}"
+    editor:
+      preview: true
     fields: # The fields for each document
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Featured Image", name: "thumbnail", widget: "image", required: false}
-      - {label: "Body", name: "body", widget: "markdown"} 
+      - {label: "Title", name: "title", widget: "string", hint: "Title yang dioptimalkan untuk SEO, sebaiknya 50-60 karakter dengan kata kunci utama"}
+      - {label: "URL Slug", name: "slug", widget: "string", pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', "Hanya huruf kecil, angka, dan tanda hubung. Contoh: panduan-seo-2024"], hint: "URL slug yang pendek, deskriptif, dan mengandung kata kunci utama"}
+      - {label: "Publish Date", name: "date", widget: "datetime", format: "YYYY-MM-DDTHH:mm:ss.SSSZ", date_format: "DD MMMM YYYY", time_format: "HH:mm", picker_utc: true}
+      - {label: "Featured Image", name: "thumbnail", widget: "image", required: false, hint: "Ukuran ideal 1200x630px untuk sharing social media", allow_multiple: false, media_library: {config: {max_file_size: 1000000}}}
+      - {label: "Author", name: "author", widget: "string", required: false, default: "SingRank Team"}
+      
+      # Content Summary
+      - {label: "Excerpt", name: "excerpt", widget: "text", required: false, hint: "Ringkasan singkat (150-160 karakter) untuk ditampilkan di halaman daftar blog. Jika kosong, akan diambil otomatis dari awal konten.", pattern: ['.{0,250}', "Maksimal 250 karakter"]}
+      - {label: "Read Time", name: "readTime", widget: "string", required: false, hint: "Estimasi waktu baca. Jika kosong, akan dihitung otomatis."}
+      
+      # SEO Fields
+      - label: "SEO Settings"
+        name: "seo"
+        widget: "object"
+        collapsed: false
+        summary: "Meta Title: {{metaTitle || 'Default title'}} | Keywords: {{focusKeywords || 'None'}}"
+        fields:
+          - {label: "Meta Title", name: "metaTitle", widget: "string", required: false, hint: "Jika kosong, akan menggunakan judul artikel. Ideal 50-60 karakter termasuk brand", pattern: ['.{0,70}', "Maksimal 70 karakter"], i18n: true}
+          - {label: "Meta Description", name: "metaDescription", widget: "text", required: false, hint: "Deskripsi untuk hasil pencarian. Ideal 150-160 karakter dengan call-to-action", pattern: ['.{0,160}', "Maksimal 160 karakter"], i18n: true}
+          - {label: "Focus Keywords", name: "focusKeywords", widget: "string", required: false, hint: "3-5 kata kunci utama dipisahkan dengan koma", i18n: true}
+          - {label: "Canonical URL", name: "canonical", widget: "string", required: false, hint: "URL lengkap jika konten ini duplikat dari URL lain"}
+          - {label: "No Index", name: "noIndex", widget: "boolean", required: false, default: false, hint: "Centang jika artikel ini tidak boleh diindeks oleh mesin pencari"}
+          - {label: "SEO Score Checker", name: "seoChecker", widget: "seo", required: false}
+      
+      # Structured Data - dengan opsi auto-generate untuk ArticleType
+      - label: "Structured Data"
+        name: "structuredData"
+        widget: "object"
+        collapsed: false
+        summary: "Type: {{articleType}} | {{mainEntity == 'FAQ' && faq.length ? faq.length + ' FAQ items' : ''}}"
+        fields:
+          - {label: "Article Type", name: "articleType", widget: "select", options: [
+              {label: "Blog Post", value: "BlogPosting"},
+              {label: "News Article", value: "NewsArticle"},
+              {label: "Technical Article", value: "TechArticle"},
+              {label: "How-To Guide", value: "HowTo"}
+            ], default: "BlogPosting", hint: "Pilih tipe artikel yang paling sesuai dengan konten"}
+          - {label: "Modified Date", name: "dateModified", widget: "datetime", required: false, format: "YYYY-MM-DDTHH:mm:ss.SSSZ", date_format: "DD MMMM YYYY", time_format: "HH:mm", picker_utc: true}
+          - label: "Main Entity"
+            name: "mainEntity"
+            widget: "select"
+            options: [
+              {label: "None", value: "None"},
+              {label: "FAQ", value: "FAQ"},
+              {label: "How-To", value: "HowTo"},
+              {label: "Product", value: "Product"},
+              {label: "Review", value: "Review"}
+            ]
+            default: "None"
+            hint: "Pilih jenis entitas utama untuk structured data"
+          - label: "FAQ Items"
+            name: "faq"
+            widget: "list"
+            required: false
+            collapsed: true
+            summary: "{{fields.question}}"
+            hint: "Tambahkan FAQ untuk structured data FAQ (hanya diperlukan jika Main Entity = FAQ)"
+            fields:
+              - {label: "Question", name: "question", widget: "string"}
+              - {label: "Answer", name: "answer", widget: "markdown"}
+          - label: "Auto-Generate Schema"
+            name: "autoGenerate"
+            widget: "boolean"
+            default: true
+            hint: "Aktifkan untuk membuat schema data secara otomatis (kecuali FAQ)"
+      
+      # Social Sharing - dengan preview
+      - label: "Social Sharing"
+        name: "socialSharing"
+        widget: "object"
+        collapsed: false
+        summary: "{{ogTitle || 'Default title'}} | {{ogImage ? 'Custom image' : 'Default image'}}"
+        fields:
+          - {label: "Open Graph Title", name: "ogTitle", widget: "string", required: false, hint: "Judul khusus untuk Facebook/LinkedIn, kosongkan untuk menggunakan meta title", i18n: true}
+          - {label: "Open Graph Description", name: "ogDescription", widget: "text", required: false, hint: "Deskripsi khusus untuk Facebook/LinkedIn, 2-3 kalimat menarik", pattern: ['.{0,200}', "Maksimal 200 karakter"], i18n: true}
+          - {label: "Open Graph Image", name: "ogImage", widget: "image", required: false, hint: "Gambar khusus untuk Facebook/LinkedIn, ideal 1200x630px", allow_multiple: false, media_library: {config: {max_file_size: 1000000}}}
+          - {label: "Twitter Title", name: "twitterTitle", widget: "string", required: false, hint: "Judul khusus untuk Twitter, kosongkan untuk menggunakan Open Graph title", i18n: true}
+          - {label: "Twitter Description", name: "twitterDescription", widget: "text", required: false, hint: "Deskripsi khusus untuk Twitter, kosongkan untuk menggunakan Open Graph description", pattern: ['.{0,200}', "Maksimal 200 karakter"], i18n: true}
+          - {label: "Twitter Image", name: "twitterImage", widget: "image", required: false, hint: "Gambar khusus untuk Twitter, ideal 1200x675px", allow_multiple: false}
+          - {label: "Twitter Card Type", name: "twitterCardType", widget: "select", options: ["summary", "summary_large_image"], default: "summary_large_image", hint: "summary_large_image untuk gambar besar, summary untuk gambar kecil"}
+          - label: "Social Preview"
+            name: "socialPreview"
+            widget: "object"
+            collapsed: true
+            fields:
+              - {label: "Facebook Preview", name: "facebookPreview", widget: "facebook_preview", default_title: "{{title}}", default_description: "{{metaDescription}}", default_image: "{{thumbnail}}"}
+              - {label: "Twitter Preview", name: "twitterPreview", widget: "twitter_preview", default_title: "{{title}}", default_description: "{{metaDescription}}", default_image: "{{thumbnail}}"}
+      
+      # Categories & Tags - dengan suggested tags
+      - label: "Categories"
+        name: "categories"
+        widget: "select"
+        multiple: true
+        options: ["SEO", "Digital Marketing", "Social Media", "Content Strategy", "Technical SEO", "Local SEO", "E-commerce SEO", "Mobile SEO", "Analytics", "PPC", "SEM", "Content Marketing", "Conversion Optimization"]
+        required: false
+        hint: "Pilih 1-3 kategori yang paling relevan"
+      
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+        hint: "Tambahkan 3-5 tag relevan yang dipisahkan dengan koma"
+        allow_add: true
+        default: ["SEO"]
+        min: 2
+        max: 8
+        
+      # Main Content
+      - {label: "Body", name: "body", widget: "markdown", hint: "Gunakan markdown editor untuk menulis konten utama. Sertakan minimal 1 heading H2, dan gambar dengan alt text yang deskriptif."}
+      
+      # Additional settings for related posts
+      - label: "Related Posts"
+        name: "relatedPosts"
+        widget: "relation"
+        collection: "blog"
+        search_fields: ["title", "tags", "categories"]
+        value_field: "slug"
+        display_fields: ["title"]
+        multiple: true
+        required: false
+        hint: "Pilih 2-3 artikel terkait untuk ditampilkan di bagian bawah artikel ini" 

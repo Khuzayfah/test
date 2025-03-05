@@ -28,6 +28,7 @@ import { RiRobot2Line } from 'react-icons/ri';
 import { SiGoogleanalytics } from 'react-icons/si';
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import dynamic from 'next/dynamic';
+import { FiCalendar, FiClock, FiArrowRight } from 'react-icons/fi';
 
 // Dynamically import components for performance
 const ParticlesContainer = dynamic(() => import('./components/ParticlesContainer'), {
@@ -83,6 +84,31 @@ const AnimatedSection = ({
       {children}
     </motion.div>
   );
+};
+
+// Import fungsi getAllPosts untuk mendapatkan artikel terbaru
+import { getAllPosts } from '../lib/blog';
+
+// Interface untuk blog post
+interface BlogPost {
+  id: string;
+  title: string;
+  date: string;
+  excerpt?: string;
+  readTime?: string;
+  thumbnail?: string;
+  categories?: string[];
+}
+
+// Fetch blog posts data
+const fetchRecentPosts = async () => {
+  try {
+    const posts = await getAllPosts();
+    return posts.slice(0, 3);
+  } catch (error) {
+    console.error('Error fetching recent posts:', error);
+    return [];
+  }
 };
 
 export default function Home() {
@@ -241,6 +267,29 @@ export default function Home() {
       description: "Monitoring and responding to customer reviews to build trust."
     }
   ];
+
+  // Recent blog posts
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
+  
+  useEffect(() => {
+    // Fetch recent posts on client side
+    const loadRecentPosts = async () => {
+      const posts = await fetchRecentPosts();
+      setRecentPosts(posts);
+    };
+    
+    loadRecentPosts();
+  }, []);
+
+  // Format tanggal
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('id-ID', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(date);
+  };
 
   return (
     <main className="overflow-x-hidden">
@@ -1351,6 +1400,102 @@ export default function Home() {
               </motion.div>
             </div>
           </AnimatedSection>
+        </div>
+      </section>
+      
+      {/* Latest Blog Posts Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Artikel Terbaru Kami
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Dapatkan informasi terbaru dan tips praktis tentang SEO dan digital marketing untuk meningkatkan visibilitas online Anda
+            </p>
+            <div className="w-20 h-1 bg-gradient-to-r from-[#7857FF] to-[#1F69FF] mx-auto mt-6"></div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {recentPosts.length > 0 ? (
+              recentPosts.map((post) => (
+                <div 
+                  key={post.id}
+                  className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 group h-full flex flex-col"
+                >
+                  <Link href={`/blog/${post.id}`} className="block h-full">
+                    <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
+                      {post.thumbnail ? (
+                        <Image
+                          src={post.thumbnail}
+                          alt={post.title}
+                          fill
+                          className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-r from-[#7857FF] to-[#1F69FF] flex items-center justify-center">
+                          <span className="text-white text-4xl font-bold">SingRank</span>
+                        </div>
+                      )}
+                      
+                      {/* Category badge */}
+                      {post.categories && post.categories.length > 0 && (
+                        <div className="absolute top-4 left-4">
+                          <span className="inline-block px-3 py-1 bg-[#fff5f5] text-[#d13239] rounded-full text-sm font-medium border border-[#ffcaca]">
+                            {post.categories[0]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="p-6 flex flex-col flex-grow">
+                      {/* Meta info */}
+                      <div className="flex items-center text-sm text-gray-500 mb-3">
+                        <div className="flex items-center mr-4">
+                          <FiCalendar size={14} className="mr-1.5" />
+                          <span>{formatDate(post.date)}</span>
+                        </div>
+                        {post.readTime && (
+                          <div className="flex items-center">
+                            <FiClock size={14} className="mr-1.5" />
+                            <span>{post.readTime}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Title */}
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#7857FF] transition-colors">
+                        {post.title}
+                      </h3>
+                      
+                      {/* Excerpt */}
+                      <p className="text-gray-600 mb-4 flex-grow line-clamp-3">
+                        {post.excerpt}
+                      </p>
+                      
+                      {/* Read more */}
+                      <div className="mt-auto pt-4 flex items-center text-[#7857FF] font-medium group-hover:text-[#1F69FF]">
+                        <span>Baca selengkapnya</span>
+                        <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-8">
+                <p className="text-gray-600">Artikel sedang dipersiapkan dan akan segera hadir</p>
+              </div>
+            )}
+          </div>
+          
+          <div className="text-center mt-12">
+            <Link href="/blog" className="inline-flex items-center justify-center px-8 py-3 rounded-lg font-medium bg-gradient-to-r from-[#7857FF] to-[#1F69FF] text-white hover:opacity-90 transition-all duration-300">
+              Lihat Semua Artikel
+              <FiArrowRight className="ml-2" />
+            </Link>
+          </div>
         </div>
       </section>
     </main>

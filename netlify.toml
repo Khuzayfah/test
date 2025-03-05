@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18.17.0"
@@ -25,13 +26,25 @@
 # Enable Netlify Identity
 [[redirects]]
   from = "/.well-known/openid-configuration"
-  to = "https://singrank.netlify.app/.well-known/openid-configuration"
+  to = "https://api.netlify.com/.well-known/openid-configuration"
   status = 200
   force = true
 
-# Enable git-gateway
+# Git Gateway - lebih spesifik
+[[redirects]]
+  from = "/.netlify/git"
+  to = "https://api.netlify.com/api/v1/repos"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/.netlify/git/*"
-  to = "https://api.netlify.com/github/content/:splat"
+  to = "https://api.netlify.com/api/v1/repos/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/.netlify/identity/*"
+  to = "https://api.netlify.com/api/v1/identity/:splat"
   status = 200
   force = true 

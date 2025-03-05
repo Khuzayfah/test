@@ -6,6 +6,8 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import dynamic from 'next/dynamic'
 import Script from 'next/script'
+import NetlifyIdentityScript from '../components/NetlifyIdentityScript'
+import NetlifyIdentityRedirect from '../components/NetlifyIdentityRedirect'
 
 // Dynamically import components with browser-only features
 // This prevents hydration errors by ensuring they only load on the client
@@ -124,7 +126,8 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         {/* Netlify Identity Script */}
-        <Script src="https://identity.netlify.com/v1/netlify-identity-widget.js" strategy="afterInteractive" />
+        <NetlifyIdentityScript />
+        <NetlifyIdentityRedirect />
         
         <div className="min-h-screen flex flex-col">
           <Navbar />
@@ -134,21 +137,6 @@ export default function RootLayout({
           <Footer />
           <ChatTerminal />
         </div>
-        
-        {/* Script for redirecting after Netlify Identity login */}
-        <Script id="netlify-identity-redirect" strategy="afterInteractive">
-          {`
-            if (window.netlifyIdentity) {
-              window.netlifyIdentity.on("init", user => {
-                if (!user) {
-                  window.netlifyIdentity.on("login", () => {
-                    document.location.href = "/admin/";
-                  });
-                }
-              });
-            }
-          `}
-        </Script>
       </body>
     </html>
   )

@@ -3,10 +3,633 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Content Manager</title>
+  <title>SingRank CMS | Content Management</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    /* Branding SingRank */
+    :root {
+      --primary-color: #7857FF;
+      --secondary-color: #1F69FF;
+      --success-color: #0A8217;
+      --warning-color: #F79009;
+      --error-color: #D7260F;
+    }
+    
+    /* Logo & Header */
+    .nc-githubAuthenticationPage-logo {
+      background-image: url('/images/singrank-logo.png') !important;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    
+    /* Warna Tema */
+    .nc-appHeader-container {
+      background-color: var(--primary-color) !important;
+    }
+    
+    .nc-appHeader-content {
+      background-color: var(--primary-color) !important;
+    }
+    
+    /* SEO Preview Styling */
+    .seo-preview-google {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+    
+    .seo-preview-google .title {
+      color: #1a0dab;
+      font-size: 18px;
+      line-height: 1.2;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .seo-preview-google .url {
+      color: #006621;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    
+    .seo-preview-google .description {
+      color: #545454;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    
+    /* SEO Score Indicators */
+    .seo-score {
+      display: flex;
+      margin-top: 10px;
+    }
+    
+    .seo-score-indicator {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    
+    .seo-score-good {
+      background-color: var(--success-color);
+    }
+    
+    .seo-score-average {
+      background-color: var(--warning-color);
+    }
+    
+    .seo-score-poor {
+      background-color: var(--error-color);
+    }
+    
+    /* Custom Widgets */
+    .schema-preview {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      font-size: 12px;
+      max-height: 300px;
+      overflow: auto;
+    }
+  </style>
 </head>
 <body>
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <!-- Debugging panel -->
+  <div id="debug-panel" class="debug-panel" style="display:none;">
+    <h3>Debug Panel</h3>
+    <div id="debug-info">Loading...</div>
+    <button onclick="checkNetlifyIdentity()">Check Identity</button>
+    <button onclick="checkGitGateway()">Check Git Gateway</button>
+    <button onclick="toggleDebugPanel()">Hide</button>
+  </div>
+  
+  <script>
+    // Show debug panel with Ctrl+Shift+D
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        toggleDebugPanel();
+      }
+    });
+    
+    function toggleDebugPanel() {
+      const panel = document.getElementById('debug-panel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    function checkNetlifyIdentity() {
+      const debugInfo = document.getElementById('debug-info');
+      
+      if (window.netlifyIdentity) {
+        const user = window.netlifyIdentity.currentUser();
+        debugInfo.innerHTML = `
+          <p>Netlify Identity: Loaded</p>
+          <p>User: ${user ? 'Logged in as ' + user.email : 'Not logged in'}</p>
+          <p>API URL: ${window.netlifyIdentity.gotrue?.api?.apiURL || 'N/A'}</p>
+        `;
+      } else {
+        debugInfo.innerHTML = '<p>Error: Netlify Identity not loaded!</p>';
+      }
+    }
+    
+    function checkGitGateway() {
+      const debugInfo = document.getElementById('debug-info');
+      debugInfo.innerHTML = '<p>Checking Git Gateway...</p>';
+      
+      fetch('/.netlify/functions/git-gateway-debug', {
+        headers: {
+          Authorization: 'Bearer ' + (window.netlifyIdentity?.currentUser()?.token?.access_token || '')
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        debugInfo.innerHTML = `
+          <p>Git Gateway Debug:</p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      })
+      .catch(err => {
+        debugInfo.innerHTML = `
+          <p>Error checking Git Gateway:</p>
+          <pre>${err.message}</pre>
+        `;
+      });
+    }
+    
+    // Init
+    window.addEventListener('load', function() {
+      console.log('Admin page loaded');
+      setTimeout(checkNetlifyIdentity, 1000);
+    });
+  </script>
+  
+  <!-- Netlify CMS -->
+  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+  
+  <!-- Schema Generator Script -->
+  <script src="./schema-generator.js"></script>
+  
+  <!-- SEO Preview Script -->
+  <script>
+    /**
+     * SEO Preview dan Checker Widget untuk Netlify CMS
+     */
+    window.addEventListener('load', () => {
+      const CMS = window.CMS;
+      if (!CMS) return;
+      
+      // Register Google Preview Widget
+      CMS.registerWidget('google_preview', {
+        control: ({ value, onChange, field }) => {
+          const defaultTitle = field.get('default_title') || '';
+          const defaultDescription = field.get('default_description') || '';
+          const title = value?.title || defaultTitle;
+          const description = value?.description || defaultDescription;
+          const url = value?.url || 'https://singrank.com/blog/url-artikel';
+          
+          const preview = `
+            <div class="seo-preview-google">
+              <div class="title">${title}</div>
+              <div class="url">${url}</div>
+              <div class="description">${description}</div>
+            </div>
+          `;
+          
+          const el = document.createElement('div');
+          el.innerHTML = preview;
+          
+          return el;
+        },
+        preview: () => {
+          return null;
+        }
+      });
+      
+      // Register Facebook Preview Widget
+      CMS.registerWidget('facebook_preview', {
+        control: ({ value, onChange, field }) => {
+          const defaultTitle = field.get('default_title') || '';
+          const defaultDescription = field.get('default_description') || '';
+          const defaultImage = field.get('default_image') || '';
+          
+          const title = value?.title || defaultTitle;
+          const description = value?.description || defaultDescription;
+          const image = value?.image || defaultImage;
+          
+          const preview = `
+            <div style="max-width: 400px; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+              <div style="background-image: url('${image || '/images/og-default.jpg'}'); background-size: cover; background-position: center; height: 200px;"></div>
+              <div style="padding: 10px;">
+                <div style="color: #365899; font-size: 14px; font-weight: bold; margin-bottom: 5px;">SingRank</div>
+                <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${title}</div>
+                <div style="font-size: 14px; color: #606770;">${description}</div>
+                <div style="font-size: 12px; color: #606770; margin-top: 5px;">SINGRANK.COM</div>
+              </div>
+            </div>
+          `;
+          
+          const el = document.createElement('div');
+          el.innerHTML = preview;
+          
+          return el;
+        },
+        preview: () => {
+          return null;
+        }
+      });
+      
+      // Register Twitter Preview Widget
+      CMS.registerWidget('twitter_preview', {
+        control: ({ value, onChange, field }) => {
+          const defaultTitle = field.get('default_title') || '';
+          const defaultDescription = field.get('default_description') || '';
+          const defaultImage = field.get('default_image') || '';
+          
+          const title = value?.title || defaultTitle;
+          const description = value?.description || defaultDescription;
+          const image = value?.image || defaultImage;
+          
+          const preview = `
+            <div style="max-width: 380px; border: 1px solid #e1e8ed; border-radius: 12px; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, 'Helvetica Neue', sans-serif;">
+              <div style="background-image: url('${image || '/images/twitter-default.jpg'}'); background-size: cover; background-position: center; height: 200px;"></div>
+              <div style="padding: 10px;">
+                <div style="font-size: 15px; font-weight: bold; margin-bottom: 5px;">${title}</div>
+                <div style="font-size: 14px; color: #657786; margin-bottom: 5px;">${description}</div>
+                <div style="font-size: 13px; color: #657786;">🌐 singrank.com</div>
+              </div>
+            </div>
+          `;
+          
+          const el = document.createElement('div');
+          el.innerHTML = preview;
+          
+          return el;
+        },
+        preview: () => {
+          return null;
+        }
+      });
+      
+      // Register Schema Preview Widget
+      CMS.registerWidget('schema_preview', {
+        control: ({ value, onChange, entry }) => {
+          const data = entry.get('data').toJS();
+          const schemaGen = window.schemaGenerator;
+          
+          if (!schemaGen) {
+            const el = document.createElement('div');
+            el.innerHTML = '<div>Schema generator not loaded</div>';
+            return el;
+          }
+          
+          const schemaPreview = schemaGen.getSchemaPreview(data);
+          
+          const preview = `
+            <div class="schema-preview">
+              <h4>Schema Data Preview</h4>
+              <pre>${schemaPreview}</pre>
+            </div>
+          `;
+          
+          const el = document.createElement('div');
+          el.innerHTML = preview;
+          
+          return el;
+        },
+        preview: () => {
+          return null;
+        }
+      });
+      
+      // Register SEO Checker Widget
+      CMS.registerWidget('seo', {
+        control: ({ value, onChange, entry, field }) => {
+          const data = entry.get('data').toJS();
+          
+          // Get values to check
+          const title = data.seo?.metaTitle || data.title || '';
+          const description = data.seo?.metaDescription || '';
+          const keywords = data.seo?.focusKeywords || '';
+          const slug = data.slug || '';
+          const content = data.body || '';
+          
+          // Calculate scores
+          const titleScore = this.checkTitleScore(title, keywords);
+          const descriptionScore = this.checkDescriptionScore(description, keywords);
+          const slugScore = this.checkSlugScore(slug, keywords);
+          
+          const totalScore = (titleScore + descriptionScore + slugScore) / 3;
+          const scoreClass = totalScore > 80 ? 'good' : (totalScore > 60 ? 'average' : 'poor');
+          
+          // Generate tips
+          const tips = [];
+          if (titleScore < 80) {
+            tips.push('Tambahkan kata kunci utama di awal judul');
+            tips.push('Judul optimal antara 50-60 karakter');
+          }
+          
+          if (descriptionScore < 80) {
+            tips.push('Tambahkan kata kunci utama di meta description');
+            tips.push('Description optimal antara 150-160 karakter');
+            tips.push('Tambahkan call-to-action di description');
+          }
+          
+          if (slugScore < 80) {
+            tips.push('Gunakan kata kunci utama dalam URL slug');
+            tips.push('Buat slug yang pendek dan deskriptif');
+          }
+          
+          // Create HTML
+          const html = `
+            <div style="margin-bottom: 15px;">
+              <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background-color: ${scoreClass === 'good' ? '#0A8217' : (scoreClass === 'average' ? '#F79009' : '#D7260F')}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px;">
+                  ${Math.round(totalScore)}
+                </div>
+                <div>
+                  <div style="font-weight: bold;">SEO Score</div>
+                  <div style="font-size: 12px;">${scoreClass === 'good' ? 'Baik' : (scoreClass === 'average' ? 'Cukup' : 'Perlu Perbaikan')}</div>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 10px;">
+                <div style="font-weight: bold; margin-bottom: 5px;">Google Preview</div>
+                <div class="seo-preview-google">
+                  <div class="title">${title || 'Judul Artikel'}</div>
+                  <div class="url">https://singrank.com/blog/${slug || 'url-artikel'}</div>
+                  <div class="description">${description || 'Deskripsi artikel belum diisi. Tambahkan meta description untuk meningkatkan SEO.'}</div>
+                </div>
+              </div>
+              
+              <div>
+                <div style="font-weight: bold; margin-bottom: 5px;">Tips Peningkatan:</div>
+                <ul style="padding-left: 20px; margin-top: 5px; font-size: 13px;">
+                  ${tips.map(tip => `<li>${tip}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          `;
+          
+          const el = document.createElement('div');
+          el.innerHTML = html;
+          
+          return el;
+        },
+        preview: () => {
+          return null;
+        }
+      });
+    });
+    
+    // Fungsi pengecekan SEO
+    function checkTitleScore(title, keywords) {
+      if (!title) return 0;
+      if (!keywords) return 50;
+      
+      const keywordArr = keywords.split(',').map(k => k.trim().toLowerCase());
+      const titleLower = title.toLowerCase();
+      
+      let score = 0;
+      
+      // Panjang judul optimal
+      const length = title.length;
+      if (length >= 40 && length <= 60) {
+        score += 30;
+      } else if (length > 30 && length < 70) {
+        score += 20;
+      } else {
+        score += 10;
+      }
+      
+      // Kata kunci dalam judul
+      let keywordFound = false;
+      for (const keyword of keywordArr) {
+        if (titleLower.includes(keyword)) {
+          keywordFound = true;
+          if (titleLower.startsWith(keyword)) {
+            score += 50; // Kata kunci di awal
+            break;
+          } else {
+            score += 30; // Kata kunci di tengah/akhir
+          }
+        }
+      }
+      
+      if (!keywordFound) {
+        score += 10;
+      }
+      
+      // Brand name di akhir
+      if (titleLower.endsWith('singrank') || titleLower.includes('| singrank')) {
+        score += 20;
+      }
+      
+      return Math.min(100, score);
+    }
+    
+    function checkDescriptionScore(description, keywords) {
+      if (!description) return 0;
+      if (!keywords) return 50;
+      
+      const keywordArr = keywords.split(',').map(k => k.trim().toLowerCase());
+      const descLower = description.toLowerCase();
+      
+      let score = 0;
+      
+      // Panjang description optimal
+      const length = description.length;
+      if (length >= 145 && length <= 160) {
+        score += 30;
+      } else if (length > 120 && length < 180) {
+        score += 20;
+      } else {
+        score += 10;
+      }
+      
+      // Kata kunci dalam description
+      let keywordFound = false;
+      for (const keyword of keywordArr) {
+        if (descLower.includes(keyword)) {
+          keywordFound = true;
+          score += 30;
+          break;
+        }
+      }
+      
+      if (!keywordFound) {
+        score += 10;
+      }
+      
+      // Call to action
+      const ctaPhrases = ['pelajari', 'kunjungi', 'baca', 'temukan', 'dapatkan', 'coba', 'lihat'];
+      let ctaFound = false;
+      for (const cta of ctaPhrases) {
+        if (descLower.includes(cta)) {
+          ctaFound = true;
+          score += 20;
+          break;
+        }
+      }
+      
+      if (!ctaFound) {
+        score += 5;
+      }
+      
+      // Terlalu banyak karakter berulang
+      const repeatedChars = /([^\s])\1{3,}/g;
+      if (repeatedChars.test(descLower)) {
+        score -= 20;
+      }
+      
+      return Math.min(100, Math.max(0, score));
+    }
+    
+    function checkSlugScore(slug, keywords) {
+      if (!slug) return 0;
+      if (!keywords) return 50;
+      
+      const keywordArr = keywords.split(',').map(k => k.trim().toLowerCase().replace(/\s+/g, '-'));
+      const slugLower = slug.toLowerCase();
+      
+      let score = 0;
+      
+      // Panjang slug optimal
+      const length = slug.length;
+      if (length >= 20 && length <= 50) {
+        score += 30;
+      } else if (length > 10 && length < 70) {
+        score += 20;
+      } else {
+        score += 10;
+      }
+      
+      // Kata kunci dalam slug
+      let keywordFound = false;
+      for (const keyword of keywordArr) {
+        if (slugLower.includes(keyword)) {
+          keywordFound = true;
+          score += 50;
+          break;
+        }
+      }
+      
+      if (!keywordFound) {
+        score += 10;
+      }
+      
+      // Format slug yang baik (huruf kecil, hanya huruf/angka/dash)
+      if (/^[a-z0-9-]+$/.test(slugLower)) {
+        score += 20;
+      } else {
+        score -= 20;
+      }
+      
+      return Math.min(100, Math.max(0, score));
+    }
+  </script>
+  
+  <!-- Auto-generate Schema Script -->
+  <script>
+    window.addEventListener('load', () => {
+      const CMS = window.CMS;
+      if (!CMS) return;
+      
+      // Listen to changes on article type and auto-generate option
+      CMS.registerEventListener({
+        name: 'preSave',
+        handler: ({ entry }) => {
+          const data = entry.get('data').toJS();
+          const autoGenerate = data.structuredData?.autoGenerate;
+          
+          if (autoGenerate && window.schemaGenerator) {
+            const schema = window.schemaGenerator.generateSchema(data);
+            console.log('Auto-generating schema:', schema);
+            
+            // Ideally, we would store this in the entry data,
+            // but since we can't directly modify the entry here,
+            // we'll save it to localStorage
+            localStorage.setItem('lastGeneratedSchema', JSON.stringify(schema));
+            
+            // Then we can reference it later or show a notification
+            const notice = document.createElement('div');
+            notice.style.position = 'fixed';
+            notice.style.bottom = '20px';
+            notice.style.right = '20px';
+            notice.style.backgroundColor = '#0A8217';
+            notice.style.color = 'white';
+            notice.style.padding = '10px 15px';
+            notice.style.borderRadius = '4px';
+            notice.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+            notice.style.zIndex = '9999';
+            notice.innerText = 'Schema data berhasil dihasilkan secara otomatis';
+            
+            document.body.appendChild(notice);
+            
+            setTimeout(() => {
+              notice.style.opacity = '0';
+              notice.style.transition = 'opacity 0.5s';
+              setTimeout(() => {
+                document.body.removeChild(notice);
+              }, 500);
+            }, 3000);
+          }
+        }
+      });
+      
+      // Add debug panel
+      const debugButton = document.createElement('button');
+      debugButton.innerText = 'SEO Debug Panel';
+      debugButton.style.position = 'fixed';
+      debugButton.style.bottom = '10px';
+      debugButton.style.left = '10px';
+      debugButton.style.zIndex = '999';
+      debugButton.style.padding = '5px 10px';
+      debugButton.style.backgroundColor = '#f0f0f0';
+      debugButton.style.border = '1px solid #ccc';
+      debugButton.style.borderRadius = '4px';
+      debugButton.style.cursor = 'pointer';
+      
+      debugButton.addEventListener('click', () => {
+        const lastSchema = localStorage.getItem('lastGeneratedSchema');
+        
+        const debugPanel = document.createElement('div');
+        debugPanel.style.position = 'fixed';
+        debugPanel.style.top = '50%';
+        debugPanel.style.left = '50%';
+        debugPanel.style.transform = 'translate(-50%, -50%)';
+        debugPanel.style.width = '80%';
+        debugPanel.style.maxWidth = '600px';
+        debugPanel.style.maxHeight = '80vh';
+        debugPanel.style.overflow = 'auto';
+        debugPanel.style.backgroundColor = 'white';
+        debugPanel.style.padding = '20px';
+        debugPanel.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+        debugPanel.style.zIndex = '10000';
+        debugPanel.style.borderRadius = '8px';
+        
+        debugPanel.innerHTML = `
+          <h3>SEO Debug Panel</h3>
+          <p>Terakhir schema yang dihasilkan:</p>
+          <pre style="background: #f4f4f4; padding: 10px; overflow: auto; max-height: 300px;">${lastSchema ? JSON.stringify(JSON.parse(lastSchema), null, 2) : 'Belum ada schema yang dihasilkan'}</pre>
+          <div style="margin-top: 20px; text-align: right;">
+            <button id="close-debug">Tutup</button>
+          </div>
+        `;
+        
+        document.body.appendChild(debugPanel);
+        
+        document.getElementById('close-debug').addEventListener('click', () => {
+          document.body.removeChild(debugPanel);
+        });
+      });
+      
+      document.body.appendChild(debugButton);
+    });
+  </script>
 </body>
 </html> 

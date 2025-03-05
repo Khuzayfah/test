@@ -10,6 +10,7 @@ This is a modern, professional website for a digital marketing agency built with
 - **Modern UI Components**: Professional cards, buttons, and form elements
 - **Interactive Elements**: Hover effects and transitions for improved user experience
 - **SEO Optimized**: Proper metadata and structure for better search engine visibility
+- **SEO Auto Generator**: Intelligent fallback system that auto-generates SEO metadata and schema markup when fields are empty
 - **Digital Loading Effect**: Welcome animation with "Welcome to SingRank! Dominate your Ranking now!" message
 - **Performance Charts**: Interactive data visualizations showing SEO results and analytics
 - **Mobile-Optimized Footer**: Specially designed compact footer for better mobile experience
@@ -19,6 +20,7 @@ This is a modern, professional website for a digital marketing agency built with
 
 - **Enhanced Mobile Responsiveness**: Significantly improved layouts for smaller screens
 - **Digital Loading Animation**: Added a sophisticated welcome animation with branding message
+- **SEO Fallback System**: New intelligent system that auto-generates SEO metadata when editors forget to fill them in
 - **Performance Optimizations**: Implemented lazy loading for charts and heavy components
 - **Button Component Refinements**: Improved type definitions and animation properties
 - **SEO Title/Metadata Updates**: Optimized page metadata for better search visibility
@@ -284,3 +286,120 @@ This project includes integration with Netlify CMS for content management:
 - Media files are uploaded to `public/images/uploads`
 
 For detailed setup instructions, refer to `NETLIFY_IDENTITY_SETUP.md`
+
+## SEO Features
+
+SingRank implements comprehensive SEO optimization for blog posts, making your content more visible to search engines and shareable on social media platforms.
+
+### Key SEO Features
+
+- **Metadata Optimization**: Each blog post can have custom meta title, description, focus keywords, and canonical URL.
+- **Structured Data**: Support for Article and FAQ structured data (JSON-LD) to enhance search engine results.
+- **Social Sharing**: Customizable Open Graph and Twitter Card metadata for optimal sharing experience.
+- **Dynamic Metadata Generation**: Uses Next.js App Router metadata API for efficient, server-side generation.
+- **SEO-Friendly URLs**: Clean, descriptive URLs for better search engine visibility.
+
+### Using SEO Features
+
+1. Add SEO metadata to your blog post frontmatter:
+
+```yaml
+seo:
+  metaTitle: "Your SEO-Optimized Title | SingRank"
+  metaDescription: "Your compelling meta description that encourages clicks (150-160 characters)."
+  focusKeywords: "main keyword, secondary keyword, long-tail keyword"
+  canonical: "https://singrank.com/blog/your-post-slug"
+  noIndex: false
+```
+
+2. Add social sharing metadata:
+
+```yaml
+socialSharing:
+  ogTitle: "Title for Facebook/LinkedIn Sharing"
+  ogDescription: "Description for when your post is shared on social platforms"
+  ogImage: "/path/to/social-image.jpg"
+  twitterTitle: "Twitter-specific title"
+  twitterDescription: "Twitter-specific description"
+  twitterCardType: "summary_large_image"
+```
+
+3. Add structured data (optional):
+
+```yaml
+structuredData:
+  articleType: "BlogPosting"
+  dateModified: "2023-07-20"
+  faq:
+    - question: "Frequently asked question?"
+      answer: "Answer to the frequently asked question."
+```
+
+For detailed documentation on SEO implementation, see [SEO_GUIDE.md](./SEO_GUIDE.md).
+
+## Netlify CMS Integration
+
+### Petunjuk Penggunaan CMS
+
+Website ini terintegrasi dengan Netlify CMS, yang memungkinkan pengelolaan konten blog melalui antarmuka admin yang user-friendly. Semua artikel blog yang dibuat melalui CMS secara otomatis akan muncul di halaman blog website.
+
+#### Mengakses Admin Panel
+
+1. Buka `/admin` pada website (contoh: `https://singrank.com/admin`)
+2. Login menggunakan akun yang telah diotorisasi
+
+#### Membuat Artikel Baru
+
+1. Klik "Blog Post" pada sidebar
+2. Klik tombol "New Blog Post"
+3. Isi formulir artikel dengan informasi yang relevan:
+   - **Title**: Judul artikel
+   - **URL Slug**: URL untuk artikel (otomatis diisi berdasarkan tanggal dan judul)
+   - **Publish Date**: Tanggal publikasi
+   - **Featured Image**: Gambar utama artikel
+   - **Author**: Penulis artikel
+   - **Excerpt**: Ringkasan singkat artikel (opsional, akan dibuat otomatis jika tidak diisi)
+   - **Read Time**: Waktu baca (opsional, akan dihitung otomatis jika tidak diisi)
+   - **Content**: Konten utama artikel dalam format Markdown
+   - **SEO Settings**: Pengaturan SEO (opsional, akan dihasilkan otomatis jika tidak diisi)
+   - **Tags & Categories**: Tag dan kategori untuk artikel
+
+4. Klik "Save" untuk menyimpan sebagai draft
+5. Klik "Publish" untuk mempublikasikan artikel langsung
+
+#### Sinkronisasi dengan Blog
+
+Semua artikel yang diterbitkan melalui CMS akan:
+
+1. Disimpan sebagai file Markdown di direktori `content/blog/`
+2. Secara otomatis muncul di halaman blog utama (`/blog`)
+3. Memiliki halaman detail sendiri (`/blog/[slug]`)
+4. Ditampilkan sebagai artikel terbaru di halaman beranda (3 artikel terkini)
+
+#### Fitur Auto-Generate SEO
+
+CMS ini dilengkapi dengan fitur Auto-Generate SEO yang memungkinkan:
+
+1. Pembuatan otomatis SEO metadata jika tidak diisi manual
+2. Pembuatan otomatis schema markup berdasarkan jenis artikel
+3. Perhitungan waktu baca otomatis
+4. Pembuatan excerpt otomatis dari konten artikel
+
+Untuk detail lebih lanjut tentang fitur ini, silakan lihat [SEO_FALLBACK_GUIDE.md](./SEO_FALLBACK_GUIDE.md).
+
+### Struktur File CMS
+
+- **Konfigurasi**: `/public/admin/config.yml`
+- **Admin Page**: `/public/admin/index.html`
+- **Post Storage**: `/content/blog/`
+- **Media Storage**: `/public/images/uploads/`
+
+### Kustomisasi CMS
+
+Untuk menyesuaikan tampilan atau fungsionalitas CMS:
+
+1. Edit file `config.yml` untuk mengubah koleksi, field, atau konfigurasi backend
+2. Edit file `index.html` untuk menyesuaikan tampilan admin
+3. Tambahkan widget kustom di direktori `/public/admin/`
+
+Untuk panduan lengkap tentang konfigurasi Netlify CMS, lihat [dokumentasi resmi Netlify CMS](https://www.netlifycms.org/docs/intro/).
